@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ hotel.name }} - Stay & Ashram Details - Yatra{% endblock %}
+
+{% block content %}
+<div class="detail-header">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+        <div>
+            <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                <span class="badge-tag" style="position: static;">{{ hotel.type }}</span>
+                {% if hotel.is_pure_veg %}
+                    <span class="badge-pure-veg"><i class="fa-solid fa-leaf"></i> 100% Pure Vegetarian</span>
+                {% endif %}
+            </div>
+            <h1 style="font-size: 2.2rem; color: var(--secondary-color); margin-bottom: 4px;">{{ hotel.name }}</h1>
+            <div style="font-size: 1rem; color: var(--text-muted);">
+                <i class="fa-solid fa-location-dot" style="color: var(--primary-color);"></i> {{ hotel.address }}
+                <span>• Located near <strong>{{ hotel.destination_name }} ({{ hotel.city }})</strong></span>
+            </div>
+        </div>
+
+        <div style="text-align: right;">
+            <div style="font-size: 1.8rem; font-weight: 800; color: var(--primary-color);">
+                ₹{{ hotel.price_per_night|int }} <span style="font-size: 1rem; font-weight: normal; color: var(--text-muted);">/ night</span>
+            </div>
+            <div style="font-size: 0.8rem; color: #888;">Sample Estimated Tariff</div>
+        </div>
+    </div>
+
+    <img src="{{ hotel.image_url }}" alt="{{ hotel.name }}" class="detail-banner" style="height: 340px;">
+</div>
+
+<div class="detail-grid">
+    <!-- Left Column: Hotel Features & Trust Guidelines -->
+    <div>
+        <div class="info-card">
+            <h3><i class="fa-solid fa-circle-check" style="color: var(--primary-color);"></i> Pilgrim Amenities & Location</h3>
+            
+            <div style="background: #eafaf1; border-left: 4px solid #27ae60; padding: 14px; border-radius: 4px; margin-bottom: 20px;">
+                <strong style="color: #1e8449;"><i class="fa-solid fa-person-walking"></i> Proximity to Temple:</strong>
+                <p style="margin-top: 4px; color: #2c3e50;">
+                    Only <strong>{{ hotel.proximity_to_temple_km }} km</strong> from the sanctum sanctorum. Easily accessible by local e-rickshaw or walking.
+                </p>
+            </div>
+
+            <h4 style="margin-bottom: 12px; color: var(--secondary-color);">Facilities & Senior Accessibility</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px;">
+                <div style="padding: 10px; background: #fdfaf6; border-radius: 4px; border: 1px solid #faebd7;">
+                    <i class="fa-solid fa-elevator" style="color: var(--primary-color);"></i> 
+                    Elevator / Lift: <strong>{% if hotel.has_lift %}Yes, All Floors{% else %}Ground Floor Rooms Available{% endif %}</strong>
+                </div>
+                <div style="padding: 10px; background: #fdfaf6; border-radius: 4px; border: 1px solid #faebd7;">
+                    <i class="fa-solid fa-wheelchair" style="color: var(--primary-color);"></i> 
+                    Wheelchair Ramp: <strong>{% if hotel.has_wheelchair_ramp %}Yes, Entrance Ramp{% else %}Assisted Entry{% endif %}</strong>
+                </div>
+                <div style="padding: 10px; background: #fdfaf6; border-radius: 4px; border: 1px solid #faebd7;">
+                    <i class="fa-solid fa-faucet-drip" style="color: var(--primary-color);"></i> 
+                    Hot Water for Snan: <strong>24/7 Geyser Supply</strong>
+                </div>
+                <div style="padding: 10px; background: #fdfaf6; border-radius: 4px; border: 1px solid #faebd7;">
+                    <i class="fa-solid fa-utensils" style="color: var(--primary-color);"></i> 
+                    Dining: <strong>Sattvic Pure Veg Kitchen</strong>
+                </div>
+            </div>
+
+            <div style="border-top: 1px solid #eee; padding-top: 14px;">
+                <p style="font-size: 0.95rem; color: var(--text-muted);">
+                    Contact / Reception Helpline: <strong>{{ hotel.contact_phone }}</strong>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Reservation / Inquiry Form -->
+    <div>
+        <div class="info-card" style="border-top: 4px solid var(--primary-color);">
+            <h3 style="color: var(--primary-color);"><i class="fa-solid fa-calendar-check"></i> Book / Reserve Stay</h3>
+            
+            <form action="{{ url_for('bookings.create_booking') }}" method="POST">
+                <input type="hidden" name="booking_type" value="hotel">
+                <input type="hidden" name="reference_id" value="{{ hotel.id }}">
+                <input type="hidden" name="total_amount" value="{{ hotel.price_per_night }}">
+
+                <div style="margin-bottom: 14px;">
+                    <label style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">Check-in Date *</label>
+                    <input type="date" name="start_date" required style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                </div>
+
+                <div style="margin-bottom: 14px;">
+                    <label style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">Check-out Date *</label>
+                    <input type="date" name="end_date" required style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                </div>
+
+                <div style="margin-bottom: 14px;">
+                    <label style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">Number of Pilgrims *</label>
+                    <input type="number" name="guests_count" min="1" max="15" value="2" required style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                </div>
+
+                <div style="margin-bottom: 18px;">
+                    <label style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">Senior / Accessibility Requests</label>
+                    <textarea name="special_requests" rows="3" placeholder="e.g. Ground floor room for elderly parents, wheelchair assistance at arrival, extra blankets..." style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);"></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 1.05rem;">
+                    Confirm Reservation Request
+                </button>
+            </form>
+
+            <div style="font-size: 0.8rem; color: #777; margin-top: 12px; text-align: center;">
+                <i class="fa-solid fa-lock"></i> Free cancellation up to 48 hours before check-in.
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 24px; padding: 14px 20px; background: #fef9e7; border-left: 4px solid var(--accent-gold); border-radius: 4px; font-size: 0.9rem; color: #7d5a00;">
+    <i class="fa-solid fa-circle-info"></i> {{ disclaimer }}
+</div>
+{% endblock %}

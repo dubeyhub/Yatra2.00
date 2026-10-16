@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+
+{% block title %}Multi-Day Pilgrimage Trip Planner - Yatra{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <div>
+        <h2><i class="fa-solid fa-calendar-check" style="color: var(--primary-color);"></i> Multi-Day Pilgrimage Planner</h2>
+        <p>Generate culturally paced day-by-day itineraries, darshan scheduling, senior accessibility, and sample budget estimates</p>
+    </div>
+</div>
+
+<!-- Planner Form Card -->
+<div class="planner-card">
+    <form action="{{ url_for('trips.planner') }}" method="POST">
+        <div style="margin-bottom: 24px;">
+            <label style="display: block; font-weight: 700; font-size: 1.05rem; color: var(--secondary-color); margin-bottom: 8px;">
+                1. Select Sacred Circuit OR Choose Individual Shrines
+            </label>
+            
+            <div style="margin-bottom: 16px;">
+                <select name="circuit_id" id="planner-circuit-select" style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 1rem;">
+                    <option value="">-- Or Pick a Pre-Designed Sacred Circuit --</option>
+                    {% for c in circuits %}
+                        <option value="{{ c.id }}" {% if preset_circuit and preset_circuit.id == c.id %}selected{% endif %}>
+                            {{ c.name }} ({{ c.total_days_recommended }} Days) - {{ c.states_covered }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="max-height: 220px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; background: #fff; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px;">
+                {% for d in destinations %}
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.92rem; cursor: pointer; padding: 4px;">
+                        <input type="checkbox" name="destination_ids" value="{{ d.id }}"
+                            {% if request.args.get('destination_id')|string == d.id|string %}checked{% endif %}>
+                        <span><strong>{{ d.name }}</strong> ({{ d.city }})</span>
+                    </label>
+                {% endfor %}
+            </div>
+            <small style="color: var(--text-muted);">Check one or more shrines, or select a circuit above.</small>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 24px;">
+            <div>
+                <label style="display: block; font-weight: 700; font-size: 0.95rem; margin-bottom: 6px;">Total Pilgrimage Days</label>
+                <input type="number" name="total_days" min="1" max="15" value="{{ preset_circuit.total_days_recommended if preset_circuit else (request.form.get('total_days', 3)) }}" required style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 1rem;">
+            </div>
+
+            <div>
+                <label style="display: block; font-weight: 700; font-size: 0.95rem; margin-bottom: 6px;">Number of Pilgrims</label>
+                <input type="number" name="travelers_count" min="1" max="30" value="{{ request.form.get('travelers_count', 2) }}" required style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 1rem;">
+            </div>
+
+            <div>
+                <label style="display: block; font-weight: 700; font-size: 0.95rem; margin-bottom: 6px;">Approximate Start Date</label>
+                <input type="date" name="start_date" value="{{ request.form.get('start_date', '') }}" style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 1rem;">
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 28px;">
+            <div>
+                <label style="display: block; font-weight: 700; font-size: 0.95rem; margin-bottom: 6px;">Traveler Profile</label>
+                <select name="traveler_profile" style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 1rem;">
+                    <option value="seniors" {% if request.form.get('traveler_profile') == 'seniors' %}selected{% endif %}>👴 Seniors / Elderly Parents (Slow pace, battery cars)</option>
+                    <option value="family" {% if request.form.get('traveler_profile', 'family') == 'family' %}selected{% endif %}>👨‍👩‍👧‍👦 Family with Children & Elders</option>
+                    <option value="couple" {% if request.form.get('traveler_profile') == 'couple' %}selected{% endif %}>👫 Couple / Spiritual Seekers</option>
+                    <option value="solo" {% if request.form.get('traveler_profile') == 'solo' %}selected{% endif %}>🚶 Solo Pilgrim / Meditator</option>
+                </select>
+            </div>
+
+            <div>
+                <label style="display: block; font-weight: 700; font-size: 0.95rem; margin-bottom: 6px;">Itinerary Pace</label>
+                <select name="pace" style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 1rem;">
+                    <option value="relaxed" {% if request.form.get('pace') == 'relaxed' %}selected{% endif %}>🌿 Relaxed (Extended rest, 1-2 sites/day)</option>
+                    <option value="balanced" {% if request.form.get('pace', 'balanced') == 'balanced' %}selected{% endif %}>⚖️ Balanced (2-3 sites, morning/evening darshan)</option>
+                    <option value="active" {% if request.form.get('pace') == 'active' %}selected{% endif %}>⚡ Active (Mangala to Shayan Aarti, comprehensive)</option>
+                </select>
+            </div>
+
+            <div>
+                <label style="display: block; font-weight: 700; font-size: 0.95rem; margin-bottom: 6px;">Budget Tier</label>
+                <select name="budget_tier" style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 1rem;">
+                    <option value="standard" {% if request.form.get('budget_tier', 'standard') == 'standard' %}selected{% endif %}>Standard (Verified Pure-Veg Hotels & Cabs)</option>
+                    <option value="economy" {% if request.form.get('budget_tier') == 'economy' %}selected{% endif %}>Economy (Ashrams, Dharamshalas & Langar)</option>
+                    <option value="comfort" {% if request.form.get('budget_tier') == 'comfort' %}selected{% endif %}>Comfort (Heritage Havelis, Premium SUVs, VIP Darshan)</option>
+                </select>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-primary" style="font-size: 1.1rem; padding: 12px 32px; border-radius: 6px; width: 100%; justify-content: center;">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Personalized Pilgrimage Itinerary
+        </button>
+    </form>
+</div>
+
+<!-- Generated Itinerary Section -->
+{% if generated_itinerary %}
+    <div class="planner-card" style="border-top: 4px solid var(--primary-color);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+            <div>
+                <span class="badge-tag" style="position: static; margin-bottom: 8px;">{{ generated_itinerary.total_days }} Days • {{ generated_itinerary.travelers_count }} Pilgrims</span>
+                <h2 style="font-size: 1.85rem; color: var(--secondary-color); margin-top: 6px;">{{ generated_itinerary.title }}</h2>
+                <div style="font-size: 0.95rem; color: var(--text-muted); margin-top: 4px;">
+                    Pace: <strong>{{ generated_itinerary.pace.capitalize() }}</strong> • Profile: <strong>{{ generated_itinerary.traveler_profile.capitalize() }}</strong> • Tier: <strong>{{ generated_itinerary.budget_tier.capitalize() }}</strong>
+                </div>
+            </div>
+
+            <!-- Save Trip Button Form -->
+            <div>
+                {% if current_user %}
+                    <form action="{{ url_for('trips.save_trip') }}" method="POST">
+                        <input type="hidden" name="title" value="{{ generated_itinerary.title }}">
+                        <input type="hidden" name="circuit_id" value="{{ generated_itinerary.circuit_id or '' }}">
+                        <input type="hidden" name="total_days" value="{{ generated_itinerary.total_days }}">
+                        <input type="hidden" name="travelers_count" value="{{ generated_itinerary.travelers_count }}">
+                        <input type="hidden" name="traveler_profile" value="{{ generated_itinerary.traveler_profile }}">
+                        <input type="hidden" name="pace" value="{{ generated_itinerary.pace }}">
+                        <input type="hidden" name="budget_tier" value="{{ generated_itinerary.budget_tier }}">
+                        <input type="hidden" name="start_date" value="{{ generated_itinerary.start_date or '' }}">
+                        <input type="hidden" name="estimated_total_cost" value="{{ generated_itinerary.budget_info.grand_total }}">
+                        {% for d in generated_itinerary.destinations %}
+                            <input type="hidden" name="destination_ids" value="{{ d.id }}">
+                        {% endfor %}
+                        <button type="submit" class="btn-primary" style="padding: 10px 24px; font-size: 1rem;">
+                            <i class="fa-solid fa-bookmark"></i> Save Trip to My Account
+                        </button>
+                    </form>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="btn-primary" style="padding: 10px 24px;">
+                        <i class="fa-solid fa-right-to-bracket"></i> Sign In to Save Trip
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Budget Summary Box -->
+        <div class="budget-summary-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
+                <div>
+                    <h3 style="font-size: 1.3rem; margin: 0; color: var(--secondary-color);">Estimated Sample Pilgrimage Budget</h3>
+                    <div style="font-size: 0.88rem; color: var(--text-muted);">{{ generated_itinerary.budget_info.tier_label }}</div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="budget-grand-total">₹{{ "{:,.0f}".format(generated_itinerary.budget_info.grand_total) }}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">₹{{ "{:,.0f}".format(generated_itinerary.budget_info.per_person_cost) }} / pilgrim</div>
+                </div>
+            </div>
+
+            <table class="budget-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Estimated Amount</th>
+                        <th>Details & Inclusions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for key, item in generated_itinerary.budget_info.breakdown.items() %}
+                        <tr>
+                            <td><strong>{{ item.label }}</strong></td>
+                            <td>₹{{ "{:,.0f}".format(item.amount) }}</td>
+                            <td style="color: var(--text-muted); font-size: 0.9rem;">{{ item.note }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div style="margin-top: 12px; font-size: 0.82rem; color: #856404;">
+                <i class="fa-solid fa-circle-info"></i> {{ generated_itinerary.budget_info.disclaimer }}
+            </div>
+        </div>
+
+        <!-- Day-wise Schedule Timeline -->
+        <h3 style="font-size: 1.5rem; color: var(--secondary-color); margin: 32px 0 20px 0;">
+            <i class="fa-solid fa-clock-rotate-left" style="color: var(--primary-color);"></i> Day-Wise Darshan & Travel Schedule
+        </h3>
+
+        {% for day in generated_itinerary.days %}
+            <div class="day-timeline-item">
+                <div class="day-badge-marker">{{ day.day_number }}</div>
+
+                <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap;">
+                        <h4 style="font-size: 1.25rem; color: var(--secondary-color); margin: 0;">{{ day.title }}</h4>
+                        {% if day.date %}
+                            <span style="font-weight: 700; color: var(--primary-color); font-size: 0.9rem;">{{ day.date }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="time-slot">
+                        <strong><i class="fa-solid fa-sun"></i> Morning Aarti & Darshan Plan:</strong>
+                        <p style="margin-top: 4px; color: var(--text-primary);">{{ day.morning_plan }}</p>
+                    </div>
+
+                    <div class="time-slot" style="background-color: #fafcf8; border-color: #e2f0d9;">
+                        <strong style="color: #27ae60;"><i class="fa-solid fa-utensils"></i> Afternoon Prasad & Rest:</strong>
+                        <p style="margin-top: 4px; color: var(--text-primary);">{{ day.afternoon_plan }}</p>
+                    </div>
+
+                    <div class="time-slot" style="background-color: #fdfaf6; border-color: #fce4d6;">
+                        <strong style="color: #c0392b;"><i class="fa-solid fa-moon"></i> Evening Aarti & Spiritual Walk:</strong>
+                        <p style="margin-top: 4px; color: var(--text-primary);">{{ day.evening_plan }}</p>
+                    </div>
+
+                    {% if day.advisories %}
+                        <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+                            {% for adv in day.advisories %}
+                                <span class="amenity-pill" style="font-size: 0.82rem; background: #fff3cd; border-color: #ffeeba; color: #856404;">
+                                    <i class="fa-solid fa-circle-exclamation"></i> {{ adv }}
+                                </span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div style="margin-top: 24px; padding: 14px 20px; background: #fef9e7; border-left: 4px solid var(--accent-gold); border-radius: 4px; font-size: 0.9rem; color: #7d5a00;">
+    <i class="fa-solid fa-circle-info"></i> {{ disclaimer }}
+</div>
+{% endblock %}

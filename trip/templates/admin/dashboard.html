@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - Yatra Pilgrimage Management{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <div>
+        <h2><i class="fa-solid fa-shield-halved" style="color: var(--primary-color);"></i> Yatra Administration</h2>
+        <p>Manage sacred destinations, verified opening hours, guest bookings, and content</p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <a href="{{ url_for('admin.manage_destinations') }}" class="btn-primary">Manage Destinations</a>
+        <a href="{{ url_for('admin.manage_bookings') }}" class="btn-outline">All Bookings</a>
+    </div>
+</div>
+
+<!-- Stats Counters -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin-bottom: 32px;">
+    <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm); border-top: 4px solid var(--primary-color);">
+        <div style="font-size: 0.88rem; color: var(--text-muted); font-weight: 600;">Destinations</div>
+        <div style="font-size: 2rem; font-weight: 800; color: var(--secondary-color); margin-top: 4px;">{{ stats.destinations }}</div>
+    </div>
+
+    <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm); border-top: 4px solid var(--accent-teal);">
+        <div style="font-size: 0.88rem; color: var(--text-muted); font-weight: 600;">Hotels & Ashrams</div>
+        <div style="font-size: 2rem; font-weight: 800; color: var(--secondary-color); margin-top: 4px;">{{ stats.hotels }}</div>
+    </div>
+
+    <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm); border-top: 4px solid #e67e22;">
+        <div style="font-size: 0.88rem; color: var(--text-muted); font-weight: 600;">Prasad & Dining</div>
+        <div style="font-size: 2rem; font-weight: 800; color: var(--secondary-color); margin-top: 4px;">{{ stats.restaurants }}</div>
+    </div>
+
+    <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm); border-top: 4px solid #2980b9;">
+        <div style="font-size: 0.88rem; color: var(--text-muted); font-weight: 600;">Total Bookings</div>
+        <div style="font-size: 2rem; font-weight: 800; color: var(--secondary-color); margin-top: 4px;">{{ stats.bookings }}</div>
+    </div>
+
+    <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm); border-top: 4px solid #27ae60;">
+        <div style="font-size: 0.88rem; color: var(--text-muted); font-weight: 600;">Saved Trips</div>
+        <div style="font-size: 2rem; font-weight: 800; color: var(--secondary-color); margin-top: 4px;">{{ stats.trips }}</div>
+    </div>
+
+    <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm); border-top: 4px solid #8e44ad;">
+        <div style="font-size: 0.88rem; color: var(--text-muted); font-weight: 600;">Registered Pilgrims</div>
+        <div style="font-size: 2rem; font-weight: 800; color: var(--secondary-color); margin-top: 4px;">{{ stats.users }}</div>
+    </div>
+</div>
+
+<!-- Recent Bookings Table -->
+<div class="planner-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="font-size: 1.35rem; color: var(--secondary-color); margin: 0;">
+            <i class="fa-solid fa-clock-rotate-left"></i> Recent Customer Bookings
+        </h3>
+        <a href="{{ url_for('admin.manage_bookings') }}" class="view-all-link">View All Bookings &rarr;</a>
+    </div>
+
+    {% if recent_bookings %}
+        <div style="overflow-x: auto;">
+            <table class="budget-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Type</th>
+                        <th>Dates</th>
+                        <th>Pilgrims</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for b in recent_bookings %}
+                        <tr>
+                            <td>#{{ b.id }}</td>
+                            <td>
+                                <strong>{{ b.user_name }}</strong><br>
+                                <small style="color: var(--text-muted);">{{ b.user_email }}</small>
+                            </td>
+                            <td><span class="badge-tag" style="position: static; font-size: 0.75rem;">{{ b.booking_type|upper }}</span></td>
+                            <td>{{ b.start_date }} to {{ b.end_date }}</td>
+                            <td>{{ b.guests_count }}</td>
+                            <td>₹{{ "{:,.0f}".format(b.total_amount) }}</td>
+                            <td>
+                                <span style="font-size: 0.8rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: {% if b.status == 'confirmed' %}#d4edda; color: #155724;{% else %}#f8d7da; color: #721c24;{% endif %}">
+                                    {{ b.status|upper }}
+                                </span>
+                            </td>
+                            <td>
+                                <form action="{{ url_for('admin.update_booking_status', booking_id=b.id) }}" method="POST" style="display: flex; gap: 4px;">
+                                    <select name="status" style="font-size: 0.8rem; padding: 2px;">
+                                        <option value="confirmed" {% if b.status == 'confirmed' %}selected{% endif %}>Confirm</option>
+                                        <option value="pending" {% if b.status == 'pending' %}selected{% endif %}>Pending</option>
+                                        <option value="cancelled" {% if b.status == 'cancelled' %}selected{% endif %}>Cancel</option>
+                                    </select>
+                                    <button type="submit" class="btn-primary" style="padding: 2px 8px; font-size: 0.75rem;">Save</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p style="color: var(--text-muted);">No bookings made yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

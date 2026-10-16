@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ destination.name }} - Darshan, Timings & Pilgrimage Guide - Yatra{% endblock %}
+
+{% block content %}
+<!-- Destination Header Banner -->
+<div class="detail-header">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                <span class="badge-tag" style="position: static;">{{ destination.category.replace('_', ' ') }}</span>
+                <span class="badge-pure-veg"><i class="fa-solid fa-hands-praying"></i> {{ destination.religion_tradition }}</span>
+                {% if destination.country and destination.country != 'India' %}
+                    <span class="badge-country"><i class="fa-solid fa-earth-americas"></i> {{ destination.country }}</span>
+                {% endif %}
+                {% if destination.verified %}
+                    <span class="badge-verified" style="position: static;"><i class="fa-solid fa-circle-check"></i> Verified Guidelines</span>
+                {% endif %}
+            </div>
+            <h1 style="font-size: 2.2rem; color: var(--secondary-color); margin-bottom: 6px;">{{ destination.name }}</h1>
+            <div style="font-size: 1.05rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-location-dot" style="color: var(--primary-color);"></i>
+                <strong>{{ destination.city }}, {{ destination.state }}{% if destination.country and destination.country != 'India' %}, {{ destination.country }}{% endif %}</strong>
+                <span>• Best time: <strong>{{ destination.best_time_to_visit }}</strong></span>
+            </div>
+        </div>
+
+        <div>
+            <a href="{{ url_for('trips.planner') }}?destination_id={{ destination.id }}" class="btn-primary" style="font-size: 1.05rem; padding: 10px 24px;">
+                <i class="fa-solid fa-calendar-plus"></i> Plan Trip to {{ destination.city }}
+            </a>
+        </div>
+    </div>
+
+    <img src="{{ destination.image_url }}" alt="{{ destination.name }}" class="detail-banner">
+
+    <p style="font-size: 1.15rem; line-height: 1.8; color: var(--text-primary); margin-bottom: 20px;">
+        {{ destination.description }}
+    </p>
+
+    {% if destination.significance %}
+        <div style="background-color: var(--accent-gold-light); border-left: 4px solid var(--accent-gold); padding: 14px 18px; border-radius: 4px; margin-bottom: 16px;">
+            <strong style="color: #8c5d15;"><i class="fa-solid fa-om"></i> Spiritual Significance:</strong>
+            <p style="margin-top: 4px; color: var(--text-primary);">{{ destination.significance }}</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Detailed Grid -->
+<div class="detail-grid">
+    <!-- Left Column: Darshan Timings, Etiquette, History -->
+    <div>
+        <!-- Verified Darshan & Aarti Schedule -->
+        <div class="info-card">
+            <h3><i class="fa-solid fa-clock" style="color: var(--primary-color);"></i> Darshan & Aarti Schedule (Verified)</h3>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 20px;">
+                <div style="background: #fdfaf6; border: 1px solid #faebd7; padding: 14px; border-radius: var(--radius-sm);">
+                    <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Opening Hours</div>
+                    <div style="font-size: 1.05rem; font-weight: 700; color: var(--secondary-color); margin-top: 4px;">{{ destination.opening_hours }}</div>
+                </div>
+
+                <div style="background: #fdfaf6; border: 1px solid #faebd7; padding: 14px; border-radius: var(--radius-sm);">
+                    <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Morning Aarti</div>
+                    <div style="font-size: 1.05rem; font-weight: 700; color: var(--primary-color); margin-top: 4px;">{{ destination.morning_aarti_time or 'Early Morning' }}</div>
+                </div>
+
+                <div style="background: #fdfaf6; border: 1px solid #faebd7; padding: 14px; border-radius: var(--radius-sm);">
+                    <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Evening Aarti</div>
+                    <div style="font-size: 1.05rem; font-weight: 700; color: var(--secondary-color); margin-top: 4px;">{{ destination.evening_aarti_time or 'Sunset / Sandhya' }}</div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+                <strong style="color: var(--secondary-color);">Darshan Timings:</strong>
+                <p style="margin-top: 4px;">{{ destination.darshan_timings }}</p>
+            </div>
+
+            {% if destination.special_darshan_info %}
+                <div style="margin-bottom: 16px;">
+                    <strong style="color: var(--secondary-color);">Special Entry & VIP Darshan:</strong>
+                    <p style="margin-top: 4px;">{{ destination.special_darshan_info }}</p>
+                </div>
+            {% endif %}
+
+            <div style="background: #f8f9fa; border: 1px solid #e9ecef; padding: 12px 16px; border-radius: var(--radius-sm);">
+                <span style="font-size: 0.88rem; color: var(--text-muted);"><i class="fa-solid fa-receipt"></i> Sample Entry & Pooja Charges:</span>
+                <div style="font-weight: 600; color: var(--text-primary); margin-top: 2px;">{{ destination.entry_fee_info }}</div>
+            </div>
+        </div>
+
+        <!-- Visitor Etiquette & Requirements -->
+        <div class="info-card">
+            <h3><i class="fa-solid fa-book-open-reader" style="color: var(--primary-color);"></i> Sacred Etiquette & Visitor Requirements</h3>
+            
+            <div class="etiquette-box">
+                <h4><i class="fa-solid fa-shirt"></i> Dress Code (Mandatory)</h4>
+                <p>{{ destination.dress_code }}</p>
+            </div>
+
+            <div class="etiquette-box" style="border-left-color: #3498db; background-color: #ebf5fb;">
+                <h4 style="color: #2980b9;"><i class="fa-solid fa-shoe-prints"></i> Footwear Guidelines</h4>
+                <p>{{ destination.footwear_rules }}</p>
+            </div>
+
+            <div class="etiquette-box" style="border-left-color: #e74c3c; background-color: #fdf2e9;">
+                <h4 style="color: #c0392b;"><i class="fa-solid fa-camera-slash"></i> Electronic Devices & Photography</h4>
+                <p>{{ destination.phone_camera_rules }}</p>
+            </div>
+
+            {% if destination.security_info %}
+                <div style="margin-bottom: 12px; font-size: 0.95rem;">
+                    <strong>Security Checkpoints:</strong> {{ destination.security_info }}
+                </div>
+            {% endif %}
+
+            {% if destination.non_hindu_entry_rules %}
+                <div style="margin-bottom: 12px; font-size: 0.95rem; background: #fdfbf7; padding: 10px; border-radius: 4px; border: 1px solid var(--border-color);">
+                    <strong>Interfaith & International Visitors:</strong> {{ destination.non_hindu_entry_rules }}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- History & Background -->
+        {% if destination.history %}
+            <div class="info-card">
+                <h3><i class="fa-solid fa-landmark" style="color: var(--primary-color);"></i> Sacred History & Architecture</h3>
+                <p style="line-height: 1.7; color: var(--text-primary);">{{ destination.history }}</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Right Column: Accessibility, Stays, Prasad -->
+    <div>
+        <!-- Senior & Family Accessibility Badge Card -->
+        <div class="info-card" style="border-top: 4px solid #0b69a3;">
+            <h3 style="color: #0b69a3;"><i class="fa-solid fa-person-cane"></i> Senior & Family Accessibility</h3>
+
+            <ul style="list-style: none; margin-bottom: 16px;">
+                <li style="padding: 8px 0; border-bottom: 1px solid #f1f1f1; display: flex; align-items: center; justify-content: space-between;">
+                    <span><i class="fa-solid fa-wheelchair" style="color: #0b69a3; width: 20px;"></i> Wheelchair Friendly</span>
+                    <strong style="color: {% if destination.wheelchair_accessible %}#28a745{% else %}#dc3545{% endif %};">
+                        {% if destination.wheelchair_accessible %}Yes, Ramps Available{% else %}Limited Ramps{% endif %}
+                    </strong>
+                </li>
+                <li style="padding: 8px 0; border-bottom: 1px solid #f1f1f1; display: flex; align-items: center; justify-content: space-between;">
+                    <span><i class="fa-solid fa-person-cane" style="color: #0b69a3; width: 20px;"></i> Senior Priority Darshan</span>
+                    <strong style="color: {% if destination.senior_priority_darshan %}#28a745{% else %}#6c757d{% endif %};">
+                        {% if destination.senior_priority_darshan %}Dedicated Queue{% else %}General Queue{% endif %}
+                    </strong>
+                </li>
+                <li style="padding: 8px 0; border-bottom: 1px solid #f1f1f1; display: flex; align-items: center; justify-content: space-between;">
+                    <span><i class="fa-solid fa-cart-shopping" style="color: #0b69a3; width: 20px;"></i> Electric Battery Car</span>
+                    <strong style="color: {% if destination.battery_car_available %}#28a745{% else %}#6c757d{% endif %};">
+                        {% if destination.battery_car_available %}Available at Gate{% else %}Not Available{% endif %}
+                    </strong>
+                </li>
+                <li style="padding: 8px 0; border-bottom: 1px solid #f1f1f1; display: flex; align-items: center; justify-content: space-between;">
+                    <span><i class="fa-solid fa-person-walking" style="color: #0b69a3; width: 20px;"></i> Walking to Sanctum</span>
+                    <strong>~{{ destination.walking_distance_meters }} meters</strong>
+                </li>
+                <li style="padding: 8px 0; display: flex; align-items: center; justify-content: space-between;">
+                    <span><i class="fa-solid fa-hospital" style="color: #0b69a3; width: 20px;"></i> Medical First Aid</span>
+                    <strong style="color: {% if destination.medical_facility_nearby %}#28a745{% else %}#6c757d{% endif %};">
+                        {% if destination.medical_facility_nearby %}Clinic Nearby{% else %}In City Center{% endif %}
+                    </strong>
+                </li>
+            </ul>
+
+            {% if destination.official_booking_url %}
+                <a href="{{ destination.official_booking_url }}" target="_blank" rel="noopener noreferrer" class="btn-outline" style="width: 100%; justify-content: center; font-size: 0.92rem;">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Official Devasthanam Portal
+                </a>
+            {% endif %}
+        </div>
+
+        <!-- Nearby Pure Veg & Ashram Stays -->
+        <div class="info-card">
+            <h3><i class="fa-solid fa-hotel" style="color: var(--primary-color);"></i> Nearby Stays & Ashrams</h3>
+            {% if hotels %}
+                {% for hotel in hotels[:3] %}
+                    <div style="padding: 10px 0; border-bottom: 1px solid #f1f1f1;">
+                        <a href="{{ url_for('hotels.hotel_details', hotel_id=hotel.id) }}" style="font-weight: 700; color: var(--secondary-color);">{{ hotel.name }}</a>
+                        <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; justify-content: space-between; margin-top: 2px;">
+                            <span>{{ hotel.type }}</span>
+                            <strong>₹{{ hotel.price_per_night|int }}/night (Sample)</strong>
+                        </div>
+                        <div style="font-size: 0.8rem; color: #28a745; margin-top: 2px;">
+                            <i class="fa-solid fa-location-arrow"></i> {{ hotel.proximity_to_temple_km }} km from sanctum
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p style="font-size: 0.9rem; color: var(--text-muted);">Verified ashrams and hotels are listed in the Stays section.</p>
+            {% endif %}
+            <a href="{{ url_for('hotels.list_hotels', destination_id=destination.id) }}" style="display: block; margin-top: 10px; font-size: 0.88rem; font-weight: 700;">View All Nearby Stays &rarr;</a>
+        </div>
+
+        <!-- Nearby Prasad & Sattvic Bhojanalayas -->
+        <div class="info-card">
+            <h3><i class="fa-solid fa-bowl-rice" style="color: var(--primary-color);"></i> Prasad & Sattvic Bhojan</h3>
+            {% if restaurants %}
+                {% for rest in restaurants[:3] %}
+                    <div style="padding: 10px 0; border-bottom: 1px solid #f1f1f1;">
+                        <strong style="color: var(--secondary-color);">{{ rest.name }}</strong>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">{{ rest.cuisine_type }}</div>
+                        <div style="font-size: 0.82rem; color: var(--text-primary); margin-top: 2px;">
+                            Special: {{ rest.special_dishes }}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p style="font-size: 0.9rem; color: var(--text-muted);">Temple prasad and dining available inside and around temple corridors.</p>
+            {% endif %}
+            <a href="{{ url_for('restaurants.list_restaurants', destination_id=destination.id) }}" style="display: block; margin-top: 10px; font-size: 0.88rem; font-weight: 700;">Explore Dining Guide &rarr;</a>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 32px; padding: 16px 20px; background: #fef9e7; border-left: 4px solid var(--accent-gold); border-radius: 4px; font-size: 0.92rem; color: #7d5a00;">
+    <i class="fa-solid fa-circle-info"></i> {{ disclaimer }}
+</div>
+{% endblock %}

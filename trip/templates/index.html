@@ -1,0 +1,280 @@
+{% extends 'base.html' %}
+
+{% block title %}Yatra - Global Sacred Pilgrimages & Spiritual Journeys{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-banner">
+    <h1>Global Sacred Pilgrimages & Spiritual Journeys</h1>
+    <p>
+        Personalized multi-day pilgrimage planning across the world's and India's holiest temples, cathedrals, sacred rivers, gurudwaras, mosques, and heritage circuits. Designed for pilgrims, families, and senior citizens.
+    </p>
+
+    <!-- Search Form -->
+    <form action="{{ url_for('destinations.list_destinations') }}" method="GET" class="hero-search-box">
+        <input type="text" name="search" placeholder="Search shrine, deity, city (e.g. Kashi, Kedarnath, Vatican, Tirupati)..." aria-label="Search destination">
+        
+        <select name="country" aria-label="Select Country">
+            <option value="">All Sacred Countries</option>
+            {% for c in countries %}
+                <option value="{{ c }}">{{ c }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="state" aria-label="Select State">
+            <option value="">All Regions</option>
+            {% for st in states %}
+                <option value="{{ st }}">{{ st }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="category" aria-label="Select Category">
+            <option value="">All Categories</option>
+            {% for cat_val, cat_label in categories %}
+                <option value="{{ cat_val }}">{{ cat_label }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit" class="btn-search">
+            <i class="fa-solid fa-magnifying-glass"></i> Search Shrines
+        </button>
+    </form>
+
+    <div class="feature-pills">
+        <div class="pill-item"><i class="fa-solid fa-person-cane"></i> Senior-Friendly Darshan</div>
+        <div class="pill-item"><i class="fa-solid fa-leaf"></i> Pure Veg & Sattvic Food</div>
+        <div class="pill-item"><i class="fa-solid fa-route"></i> Multi-Day Day-wise Itineraries</div>
+        <div class="pill-item"><i class="fa-solid fa-shield-halved"></i> Verified Timings & Etiquette</div>
+        <div class="pill-item"><i class="fa-solid fa-indian-rupee-sign"></i> Transparent Sample Estimates</div>
+    </div>
+</section>
+
+<!-- Global Sacred Pilgrimage Landmarks -->
+<section style="margin-bottom: 40px;">
+    <div class="section-header">
+        <div>
+            <h2><i class="fa-solid fa-earth-americas" style="color: var(--primary-color);"></i> Global Pilgrimage Landmarks</h2>
+            <p>Sacred sites across Vatican City, Nepal, Israel, Saudi Arabia, Japan, and Spain</p>
+        </div>
+        <a href="{{ url_for('destinations.list_destinations') }}" class="view-all-link">Browse All Worldwide &rarr;</a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px;">
+        <a href="{{ url_for('destinations.list_destinations', country='Vatican City') }}" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px; text-decoration: none; color: inherit; box-shadow: var(--shadow-sm); transition: transform 0.2s; border-left: 4px solid var(--accent-gold);">
+            <div style="font-size: 1.15rem; margin-bottom: 4px;">🇻🇦 <strong>Vatican City</strong></div>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">St. Peter's Basilica & Sistine Chapel</p>
+        </a>
+        <a href="{{ url_for('destinations.list_destinations', country='Nepal') }}" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px; text-decoration: none; color: inherit; box-shadow: var(--shadow-sm); transition: transform 0.2s; border-left: 4px solid var(--primary-color);">
+            <div style="font-size: 1.15rem; margin-bottom: 4px;">🇳🇵 <strong>Nepal</strong></div>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Lumbini Sacred Garden & Pashupatinath</p>
+        </a>
+        <a href="{{ url_for('destinations.list_destinations', country='Israel') }}" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px; text-decoration: none; color: inherit; box-shadow: var(--shadow-sm); transition: transform 0.2s; border-left: 4px solid #2980b9);">
+            <div style="font-size: 1.15rem; margin-bottom: 4px;">🇮🇱 <strong>Jerusalem</strong></div>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Church of the Holy Sepulchre & Western Wall</p>
+        </a>
+        <a href="{{ url_for('destinations.list_destinations', country='Saudi Arabia') }}" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px; text-decoration: none; color: inherit; box-shadow: var(--shadow-sm); transition: transform 0.2s; border-left: 4px solid #27ae60);">
+            <div style="font-size: 1.15rem; margin-bottom: 4px;">🇸🇦 <strong>Saudi Arabia</strong></div>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Masjid al-Haram & Holy Kaaba, Mecca</p>
+        </a>
+        <a href="{{ url_for('destinations.list_destinations', country='Japan') }}" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px; text-decoration: none; color: inherit; box-shadow: var(--shadow-sm); transition: transform 0.2s; border-left: 4px solid #c0392b);">
+            <div style="font-size: 1.15rem; margin-bottom: 4px;">🇯🇵 <strong>Japan (Kyoto)</strong></div>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Fushimi Inari-Taisha Sacred Shrine</p>
+        </a>
+        <a href="{{ url_for('destinations.list_destinations', country='Spain') }}" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px; text-decoration: none; color: inherit; box-shadow: var(--shadow-sm); transition: transform 0.2s; border-left: 4px solid #d35400);">
+            <div style="font-size: 1.15rem; margin-bottom: 4px;">🇪🇸 <strong>Spain (Galicia)</strong></div>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Cathedral of Santiago de Compostela</p>
+        </a>
+    </div>
+</section>
+
+<!-- Focus Religious Regions & Circuits -->
+<section style="margin-bottom: 40px;">
+    <div class="section-header">
+        <div>
+            <h2><i class="fa-solid fa-map-marked-alt" style="color: var(--primary-color);"></i> Key Indian Pilgrimage States</h2>
+            <p>Explore holy tirthas across India's sacred geography</p>
+        </div>
+        <a href="{{ url_for('destinations.list_destinations') }}" class="view-all-link">Browse All Shrines &rarr;</a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px;">
+        <a href="{{ url_for('destinations.list_destinations', state='Uttar Pradesh') }}" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px; text-decoration: none; color: inherit; box-shadow: var(--shadow-sm); transition: transform 0.2s; border-left: 4px solid var(--primary-color);">
+            <h3 style="font-size: 1.1rem; margin-bottom: 4px;">Uttar Pradesh</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Mathura, Vrindavan, Ayodhya, Varanasi, Prayagraj</p>
+        </a>
+        <a href="{{ url_for('destinations.list_destinations', state='Uttarakhand') }}" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px; text-decoration: none; color: inherit; box-shadow: var(--shadow-sm); transition: transform 0.2s; border-left: 4px solid var(--accent-teal);">
+            <h3 style="font-size: 1.1rem; margin-bottom: 4px;">Uttarakhand</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Haridwar, Rishikesh, Kedarnath, Badrinath</p>
+        </a>
+        <a href="{{ url_for('destinations.list_destinations', state='Gujarat') }}" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px; text-decoration: none; color: inherit; box-shadow: var(--shadow-sm); transition: transform 0.2s; border-left: 4px solid #e67e22;">
+            <h3 style="font-size: 1.1rem; margin-bottom: 4px;">Gujarat</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Dwarka Jagat Mandir & Somnath Jyotirlinga</p>
+        </a>
+        <a href="{{ url_for('destinations.list_destinations', state='Rajasthan') }}" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px; text-decoration: none; color: inherit; box-shadow: var(--shadow-sm); transition: transform 0.2s; border-left: 4px solid #d35400;">
+            <h3 style="font-size: 1.1rem; margin-bottom: 4px;">Rajasthan</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Ajmer Sharif Dargah & Pushkar Brahma Temple</p>
+        </a>
+        <a href="{{ url_for('destinations.list_destinations', state='Punjab') }}" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px; text-decoration: none; color: inherit; box-shadow: var(--shadow-sm); transition: transform 0.2s; border-left: 4px solid var(--accent-gold);">
+            <h3 style="font-size: 1.1rem; margin-bottom: 4px;">Punjab</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Sri Harmandir Sahib (Golden Temple), Amritsar</p>
+        </a>
+        <a href="{{ url_for('destinations.list_destinations', state='Andhra Pradesh') }}" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px; text-decoration: none; color: inherit; box-shadow: var(--shadow-sm); transition: transform 0.2s; border-left: 4px solid #2980b9;">
+            <h3 style="font-size: 1.1rem; margin-bottom: 4px;">Andhra Pradesh</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Sri Venkateswara Swamy Temple (Tirumala Tirupati)</p>
+        </a>
+        <a href="{{ url_for('destinations.list_destinations', state='Tamil Nadu') }}" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px; text-decoration: none; color: inherit; box-shadow: var(--shadow-sm); transition: transform 0.2s; border-left: 4px solid #8e44ad;">
+            <h3 style="font-size: 1.1rem; margin-bottom: 4px;">Tamil Nadu</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Rameswaram Jyotirlinga & Madurai Meenakshi</p>
+        </a>
+        <a href="{{ url_for('destinations.list_destinations', state='Maharashtra') }}" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px; text-decoration: none; color: inherit; box-shadow: var(--shadow-sm); transition: transform 0.2s; border-left: 4px solid #27ae60;">
+            <h3 style="font-size: 1.1rem; margin-bottom: 4px;">Maharashtra</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Shirdi Sai Baba & Trimbakeshwar Jyotirlinga</p>
+        </a>
+        <a href="{{ url_for('destinations.list_destinations', state='Bihar') }}" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px; text-decoration: none; color: inherit; box-shadow: var(--shadow-sm); transition: transform 0.2s; border-left: 4px solid #f39c12;">
+            <h3 style="font-size: 1.1rem; margin-bottom: 4px;">Bihar</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Mahabodhi Temple & Sacred Bodhi Tree, Bodh Gaya</p>
+        </a>
+        <a href="{{ url_for('destinations.list_destinations', state='Odisha') }}" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px; text-decoration: none; color: inherit; box-shadow: var(--shadow-sm); transition: transform 0.2s; border-left: 4px solid #c0392b;">
+            <h3 style="font-size: 1.1rem; margin-bottom: 4px;">Odisha</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Shree Jagannath Temple & Puri Dham</p>
+        </a>
+    </div>
+</section>
+
+<!-- Featured Sacred Destinations -->
+<section style="margin-bottom: 48px;">
+    <div class="section-header">
+        <div>
+            <h2><i class="fa-solid fa-hands-praying" style="color: var(--primary-color);"></i> Revered Holy Shrines</h2>
+            <p>Verified darshan guidelines, senior accessibility, and sample costs</p>
+        </div>
+        <a href="{{ url_for('destinations.list_destinations') }}" class="view-all-link">View All 30+ Shrines &rarr;</a>
+    </div>
+
+    <div class="cards-grid">
+        {% for dest in featured_destinations %}
+            <article class="card">
+                <div class="card-img-wrapper">
+                    <img src="{{ dest.image_url }}" alt="{{ dest.name }}" class="card-img" loading="lazy">
+                    <span class="badge-tag">{{ dest.category.replace('_', ' ') }}</span>
+                    {% if dest.country and dest.country != 'India' %}
+                        <span class="badge-country"><i class="fa-solid fa-earth-americas"></i> {{ dest.country }}</span>
+                    {% endif %}
+                    {% if dest.verified %}
+                        <span class="badge-verified"><i class="fa-solid fa-circle-check"></i> Verified Info</span>
+                    {% endif %}
+                </div>
+
+                <div class="card-body">
+                    <h3 class="card-title">{{ dest.name }}</h3>
+                    <div class="card-location">
+                        <i class="fa-solid fa-location-dot" style="color: var(--primary-color);"></i> {{ dest.city }}, {{ dest.state }}{% if dest.country and dest.country != 'India' %}, {{ dest.country }}{% endif %}
+                    </div>
+
+                    <p class="card-text">{{ dest.description }}</p>
+
+                    <div class="card-amenities">
+                        {% if dest.senior_priority_darshan %}
+                            <span class="amenity-pill"><i class="fa-solid fa-person-cane"></i> Senior Priority</span>
+                        {% endif %}
+                        {% if dest.wheelchair_accessible %}
+                            <span class="amenity-pill"><i class="fa-solid fa-wheelchair"></i> Wheelchair Access</span>
+                        {% endif %}
+                        <span class="badge-pure-veg"><i class="fa-solid fa-seedling"></i> {{ dest.religion_tradition }}</span>
+                    </div>
+
+                    <div class="card-footer">
+                        <div class="card-price">
+                            Opening: <strong>{{ dest.opening_hours.split('&')[0] }}</strong>
+                        </div>
+                        <a href="{{ url_for('destinations.destination_detail', dest_id=dest.id) }}" class="btn-outline">
+                            Details & Darshan &rarr;
+                        </a>
+                    </div>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Sacred Circuits Section -->
+<section style="margin-bottom: 48px; background: #ffffff; padding: 32px; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+    <div class="section-header">
+        <div>
+            <h2><i class="fa-solid fa-route" style="color: var(--primary-color);"></i> Sacred Pilgrimage Circuits</h2>
+            <p>Carefully planned multi-day spiritual journeys with accommodation and transport recommendations</p>
+        </div>
+        <a href="{{ url_for('destinations.circuits') }}" class="view-all-link">All Circuits &rarr;</a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px;">
+        {% for circuit in circuits[:3] %}
+            <div style="border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden; background: #fdfbf7;">
+                <div style="height: 180px; position: relative;">
+                    <img src="{{ circuit.image_url }}" alt="{{ circuit.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    <span style="position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.75); color: #fff; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-weight: bold;">
+                        ⏱ {{ circuit.total_days_recommended }} Days
+                    </span>
+                </div>
+                <div style="padding: 20px;">
+                    <h3 style="font-size: 1.25rem; margin-bottom: 6px; color: var(--secondary-color);">{{ circuit.name }}</h3>
+                    <div style="font-size: 0.88rem; color: var(--accent-teal); font-weight: 600; margin-bottom: 10px;">
+                        Theme: {{ circuit.theme }}
+                    </div>
+                    <p style="font-size: 0.92rem; color: var(--text-primary); margin-bottom: 16px; line-height: 1.5;">
+                        {{ circuit.description }}
+                    </p>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.85rem; color: var(--text-muted);">Region: <strong>{{ circuit.states_covered }}</strong></span>
+                        <a href="{{ url_for('trips.planner', circuit_id=circuit.id) }}" class="btn-primary" style="padding: 6px 14px; font-size: 0.9rem;">
+                            Plan This Circuit &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Upcoming Sacred Festivals & Seasonal Dates -->
+<section style="margin-bottom: 48px;">
+    <div class="section-header">
+        <div>
+            <h2><i class="fa-solid fa-calendar-days" style="color: var(--primary-color);"></i> Sacred Festivals & Crowd Advisories</h2>
+            <p>Clearly dated spiritual gatherings with essential rituals and preparation tips</p>
+        </div>
+        <a href="{{ url_for('destinations.festivals') }}" class="view-all-link">Festival Calendar &rarr;</a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+        {% for f in festivals %}
+            <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                    <h3 style="font-size: 1.15rem; color: var(--secondary-color);">{{ f.name }}</h3>
+                    <span style="background-color: {% if f.crowd_level == 'Extremely Crowded' %}#f8d7da{% else %}#fff3cd{% endif %}; color: {% if f.crowd_level == 'Extremely Crowded' %}#721c24{% else %}#856404{% endif %}; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700;">
+                        {{ f.crowd_level }}
+                    </span>
+                </div>
+                <div style="font-size: 0.88rem; color: var(--primary-color); font-weight: 600; margin-bottom: 10px;">
+                    <i class="fa-solid fa-clock"></i> {{ f.dated_info_month }} • {{ f.city }}
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-primary); margin-bottom: 14px; flex: 1;">{{ f.description }}</p>
+                <div style="font-size: 0.82rem; background: var(--bg-parchment); padding: 8px; border-radius: 4px; border-left: 3px solid var(--accent-gold);">
+                    <strong>Key Rituals:</strong> {{ f.key_rituals }}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Multi-day Planner Banner -->
+<section style="background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%); color: #ffffff; border-radius: var(--radius-lg); padding: 40px; text-align: center; box-shadow: var(--shadow-lg);">
+    <h2 style="color: #ffffff; font-size: 2.2rem; margin-bottom: 12px;">Plan Your Personalized Pilgrimage</h2>
+    <p style="font-size: 1.15rem; max-width: 700px; margin: 0 auto 24px auto; color: #fdfbf7;">
+        Generate day-by-day darshan schedules, senior citizen pacing, pure-vegetarian dining recommendations, and itemized travel budgets in seconds.
+    </p>
+    <a href="{{ url_for('trips.planner') }}" class="btn-primary" style="background-color: var(--accent-gold); color: #1c2833; font-size: 1.1rem; padding: 12px 32px; font-weight: 700; border-radius: 30px;">
+        <i class="fa-solid fa-sparkles"></i> Launch Pilgrimage Planner
+    </a>
+</section>
+{% endblock %}

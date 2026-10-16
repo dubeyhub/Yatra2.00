@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Pilgrimage Vehicles & Senior-Comfort Cabs - Yatra{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <div>
+        <h2><i class="fa-solid fa-van-shuttle" style="color: var(--primary-color);"></i> Pilgrimage Vehicles & Family Transports</h2>
+        <p>Reliable, sanitized vehicles with experienced pilgrimage chauffeurs for senior and family comfort</p>
+    </div>
+</div>
+
+<div class="cards-grid">
+    {% for v in vehicles %}
+        <div class="card">
+            <div class="card-img-wrapper">
+                <img src="{{ v.image_url }}" alt="{{ v.vehicle_type }}" class="card-img">
+                <span class="badge-tag"><i class="fa-solid fa-users"></i> {{ v.capacity }} Seats</span>
+                {% if v.senior_friendly_comfort %}
+                    <span class="badge-verified"><i class="fa-solid fa-person-cane"></i> Senior Recommended</span>
+                {% endif %}
+            </div>
+
+            <div class="card-body">
+                <h3 class="card-title">{{ v.vehicle_type }}</h3>
+                <div class="card-location">
+                    <i class="fa-solid fa-shield-heart" style="color: var(--primary-color);"></i> Fully Insured & Sanitized
+                </div>
+
+                <p class="card-text">{{ v.features }}</p>
+
+                <div class="card-amenities">
+                    {% if v.ac_available %}
+                        <span class="amenity-pill"><i class="fa-solid fa-snowflake"></i> Chilled Air Conditioning</span>
+                    {% endif %}
+                    <span class="amenity-pill"><i class="fa-solid fa-gas-pump"></i> Fuel Included in Tariff</span>
+                    <span class="amenity-pill"><i class="fa-solid fa-id-card"></i> Verified Chauffeur</span>
+                </div>
+
+                <div style="background: #fdfaf6; border: 1px solid #faebd7; padding: 12px; border-radius: var(--radius-sm); margin-bottom: 16px; font-size: 0.88rem;">
+                    <div>Base Rate: <strong>₹{{ v.price_per_day|int }} / day</strong> (Sample rate)</div>
+                    <div>Extra Km: <strong>₹{{ v.price_per_km }}/km</strong> | Driver Allowance: <strong>₹{{ v.driver_allowance_per_day|int }}/day</strong></div>
+                </div>
+
+                <div class="card-footer">
+                    <div class="card-price">
+                        From <strong>₹{{ v.price_per_day|int }}</strong> / day
+                    </div>
+                    <a href="{{ url_for('vehicles.vehicle_booking', vehicle_id=v.id) }}" class="btn-primary" style="padding: 6px 16px;">
+                        Inquire / Book &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<div style="margin-top: 24px; padding: 14px 20px; background: #fef9e7; border-left: 4px solid var(--accent-gold); border-radius: 4px; font-size: 0.9rem; color: #7d5a00;">
+    <i class="fa-solid fa-circle-info"></i> {{ disclaimer }}
+</div>
+{% endblock %}

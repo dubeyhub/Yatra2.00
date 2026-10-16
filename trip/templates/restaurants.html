@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Prasad, Langar & Sattvic Bhojan Guide - Yatra{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <div>
+        <h2><i class="fa-solid fa-bowl-rice" style="color: var(--primary-color);"></i> Sacred Prasad, Langar & Sattvic Dining</h2>
+        <p>Pure vegetarian bhojanalayas, temple kitchens, free community langars, and authentic pilgrim dining</p>
+    </div>
+    <div style="font-size: 0.95rem; font-weight: 600; color: var(--text-muted);">
+        {{ restaurants|length }} dining places
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="filter-card">
+    <form action="{{ url_for('restaurants.list_restaurants') }}" method="GET">
+        <div class="filter-row">
+            <div class="filter-group">
+                <label for="destination_id">Destination</label>
+                <select name="destination_id" id="destination_id" onchange="this.form.submit()">
+                    <option value="">All Sacred Shrines</option>
+                    {% for d in destinations %}
+                        <option value="{{ d.id }}" {% if filters.destination_id|string == d.id|string %}selected{% endif %}>{{ d.name }} ({{ d.city }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="cuisine_type">Dining Category</label>
+                <select name="cuisine_type" id="cuisine_type" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    <option value="Sattvic (No Onion/Garlic)" {% if filters.cuisine_type == 'Sattvic (No Onion/Garlic)' %}selected{% endif %}>Sattvic (No Onion/Garlic)</option>
+                    <option value="Temple Prasad / Mahaprasad" {% if filters.cuisine_type == 'Temple Prasad / Mahaprasad' %}selected{% endif %}>Temple Prasad / Mahaprasad</option>
+                    <option value="Gurudwara Langar (Seva)" {% if filters.cuisine_type == 'Gurudwara Langar (Seva)' %}selected{% endif %}>Gurudwara Langar (Seva)</option>
+                    <option value="Pure Vegetarian Thali" {% if filters.cuisine_type == 'Pure Vegetarian Thali' %}selected{% endif %}>Pure Vegetarian Thali</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="search">Dish or Location Search</label>
+                <input type="text" name="search" id="search" value="{{ filters.search or '' }}" placeholder="Peda, Thali, Langar, Khichdi...">
+            </div>
+
+            <div class="filter-group" style="display: flex; flex-direction: row; align-items: center; gap: 8px; padding-bottom: 8px;">
+                <input type="checkbox" name="is_sattvic" id="is_sattvic" value="1" {% if filters.is_sattvic %}checked{% endif %} onchange="this.form.submit()">
+                <label for="is_sattvic" style="cursor: pointer; margin: 0; font-weight: 600;">🌿 Strict Sattvic Only</label>
+            </div>
+
+            <div style="display: flex; gap: 8px;">
+                <button type="submit" class="btn-primary" style="padding: 9px 18px;">Filter</button>
+                <a href="{{ url_for('restaurants.list_restaurants') }}" class="btn-outline" style="padding: 8px 14px;">Reset</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Grid -->
+<div class="cards-grid">
+    {% for r in restaurants %}
+        <div class="card">
+            <div class="card-body">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                    <span class="badge-tag" style="position: static;">{{ r.cuisine_type }}</span>
+                    {% if r.is_sattvic %}
+                        <span class="badge-pure-veg"><i class="fa-solid fa-leaf"></i> Sattvic</span>
+                    {% endif %}
+                </div>
+
+                <h3 class="card-title">{{ r.name }}</h3>
+                <div class="card-location">
+                    <i class="fa-solid fa-location-dot" style="color: var(--primary-color);"></i> {{ r.address }} ({{ r.city }})
+                </div>
+
+                <div style="background: #fdfaf6; border: 1px solid #faebd7; padding: 12px; border-radius: var(--radius-sm); margin-bottom: 16px;">
+                    <strong style="color: var(--secondary-color); font-size: 0.88rem;"><i class="fa-solid fa-utensils"></i> Sacred Specialities:</strong>
+                    <p style="margin-top: 4px; font-size: 0.92rem; color: var(--text-primary);">{{ r.special_dishes }}</p>
+                </div>
+
+                <div style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px;">
+                    <i class="fa-solid fa-clock"></i> Service Timings: <strong>{{ r.opening_hours }}</strong>
+                </div>
+
+                <div class="card-footer">
+                    <div class="card-price">
+                        {% if r.avg_cost_for_two == 0 %}
+                            <strong style="color: #27ae60; font-size: 1.1rem;"><i class="fa-solid fa-heart"></i> Free Seva / Prasadam</strong>
+                        {% else %}
+                            Approx <strong>₹{{ r.avg_cost_for_two|int }}</strong> for two
+                        {% endif %}
+                    </div>
+
+                    <a href="{{ url_for('destinations.destination_detail', dest_id=r.destination_id) }}" class="btn-outline" style="padding: 5px 12px; font-size: 0.85rem;">
+                        Shrine Info &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<div style="margin-top: 24px; padding: 14px 20px; background: #fef9e7; border-left: 4px solid var(--accent-gold); border-radius: 4px; font-size: 0.9rem; color: #7d5a00;">
+    <i class="fa-solid fa-circle-info"></i> {{ disclaimer }}
+</div>
+{% endblock %}

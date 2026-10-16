@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - Yatra{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <div>
+        <h2><i class="fa-solid fa-user-circle" style="color: var(--primary-color);"></i> Pilgrim Profile</h2>
+        <p>Manage your pilgrimage preferences and account information</p>
+    </div>
+</div>
+
+<div class="detail-grid">
+    <!-- Left Column: Edit Profile Form -->
+    <div>
+        <div class="info-card">
+            <h3 style="color: var(--secondary-color);"><i class="fa-solid fa-id-card"></i> Personal Details</h3>
+            
+            <form action="{{ url_for('auth.profile') }}" method="POST">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: 600; font-size: 0.92rem; margin-bottom: 6px;">Username</label>
+                    <input type="text" value="{{ user.username }}" disabled style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; background: #f8f9fa; border-radius: var(--radius-sm); font-size: 1rem;">
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: 600; font-size: 0.92rem; margin-bottom: 6px;">Email Address</label>
+                    <input type="email" value="{{ user.email }}" disabled style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; background: #f8f9fa; border-radius: var(--radius-sm); font-size: 1rem;">
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label for="full_name" style="display: block; font-weight: 600; font-size: 0.92rem; margin-bottom: 6px;">Full Name</label>
+                    <input type="text" name="full_name" id="full_name" value="{{ user.full_name }}" required style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 1rem;">
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <label for="phone" style="display: block; font-weight: 600; font-size: 0.92rem; margin-bottom: 6px;">Phone / WhatsApp Number</label>
+                    <input type="tel" name="phone" id="phone" value="{{ user.phone or '' }}" style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 1rem;">
+                </div>
+
+                <button type="submit" class="btn-primary" style="padding: 10px 24px;">
+                    Save Profile Changes
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Right Column: Account Stats -->
+    <div>
+        <div class="info-card">
+            <h3><i class="fa-solid fa-chart-simple" style="color: var(--primary-color);"></i> Spiritual Journey Stats</h3>
+            
+            <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 16px;">
+                <div style="background: #fdfaf6; border: 1px solid #faebd7; padding: 16px; border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 0.88rem; color: var(--text-muted);">Saved Pilgrimage Itineraries</div>
+                        <div style="font-size: 1.6rem; font-weight: 800; color: var(--secondary-color);">{{ trips_count }}</div>
+                    </div>
+                    <a href="{{ url_for('trips.my_trips') }}" class="btn-outline" style="font-size: 0.85rem; padding: 4px 10px;">View Trips</a>
+                </div>
+
+                <div style="background: #fdfaf6; border: 1px solid #faebd7; padding: 16px; border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 0.88rem; color: var(--text-muted);">Active & Past Bookings</div>
+                        <div style="font-size: 1.6rem; font-weight: 800; color: var(--secondary-color);">{{ bookings_count }}</div>
+                    </div>
+                    <a href="{{ url_for('bookings.my_bookings') }}" class="btn-outline" style="font-size: 0.85rem; padding: 4px 10px;">View Bookings</a>
+                </div>
+            </div>
+
+            <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #eee;">
+                <div style="font-size: 0.88rem; color: var(--text-muted);">Role: <strong>{{ user.role|upper }}</strong></div>
+                <div style="font-size: 0.88rem; color: var(--text-muted); margin-top: 4px;">Account Member Since: {{ user.created_at }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Sacred Destinations - Admin - Yatra{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <div>
+        <h2><i class="fa-solid fa-gopuram" style="color: var(--primary-color);"></i> Manage Sacred Destinations</h2>
+        <p>Verify opening hours, visitor requirements, and add new shrines</p>
+    </div>
+    <div>
+        <a href="{{ url_for('admin.create_destination') }}" class="btn-primary">
+            <i class="fa-solid fa-plus"></i> Add New Destination
+        </a>
+    </div>
+</div>
+
+<div class="planner-card">
+    <div style="overflow-x: auto;">
+        <table class="budget-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Location</th>
+                    <th>Category</th>
+                    <th>Tradition</th>
+                    <th>Verified</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for d in destinations %}
+                    <tr>
+                        <td>{{ d.id }}</td>
+                        <td>
+                            <strong>{{ d.name }}</strong>
+                        </td>
+                        <td>{{ d.city }}, {{ d.state }}</td>
+                        <td><span class="badge-tag" style="position: static; font-size: 0.72rem;">{{ d.category.replace('_', ' ') }}</span></td>
+                        <td>{{ d.religion_tradition }}</td>
+                        <td>
+                            {% if d.verified %}
+                                <span style="color: #28a745; font-weight: bold;"><i class="fa-solid fa-circle-check"></i> Yes</span>
+                            {% else %}
+                                <span style="color: #dc3545;">Pending</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 8px;">
+                                <a href="{{ url_for('admin.edit_destination', dest_id=d.id) }}" class="btn-outline" style="padding: 4px 10px; font-size: 0.8rem;">
+                                    Edit
+                                </a>
+                                <form action="{{ url_for('admin.delete_destination', dest_id=d.id) }}" method="POST" onsubmit="return confirm('Delete destination {{ d.name }}?');" style="display: inline;">
+                                    <button type="submit" class="btn-outline" style="padding: 4px 10px; font-size: 0.8rem; color: #dc3545; border-color: #dc3545;">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}Sacred Destinations & Global Pilgrimages - Yatra{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <div>
+        <h2><i class="fa-solid fa-gopuram" style="color: var(--primary-color);"></i> Global Sacred Destinations & Pilgrimages</h2>
+        <p>Explore holy temples, cathedrals, sacred rivers, mosques, gurudwaras, and world shrines</p>
+    </div>
+    <div style="font-size: 0.95rem; font-weight: 600; color: var(--text-muted);">
+        Found {{ destinations|length }} sacred sites
+    </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="filter-card">
+    <form action="{{ url_for('destinations.list_destinations') }}" method="GET">
+        <div class="filter-row">
+            <div class="filter-group">
+                <label for="country">Country</label>
+                <select name="country" id="country" onchange="this.form.submit()">
+                    <option value="">All Countries</option>
+                    {% for c in countries %}
+                        <option value="{{ c }}" {% if filters.country == c %}selected{% endif %}>{{ c }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="state">State / Region</label>
+                <select name="state" id="state" onchange="this.form.submit()">
+                    <option value="">All Regions</option>
+                    {% for st in states %}
+                        <option value="{{ st }}" {% if filters.state == st %}selected{% endif %}>{{ st }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="category">Category</label>
+                <select name="category" id="category" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    {% for cat_val, cat_label in categories %}
+                        <option value="{{ cat_val }}" {% if filters.category == cat_val %}selected{% endif %}>{{ cat_label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="religion">Tradition</label>
+                <select name="religion" id="religion" onchange="this.form.submit()">
+                    <option value="">All Traditions</option>
+                    {% for rel in religions %}
+                        <option value="{{ rel }}" {% if filters.religion == rel %}selected{% endif %}>{{ rel }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="live-search-input">Search Keyword</label>
+                <input type="text" name="search" id="live-search-input" value="{{ filters.search or '' }}" placeholder="City, deity, name...">
+            </div>
+
+            <div class="filter-group" style="display: flex; flex-direction: row; align-items: center; gap: 8px; padding-bottom: 8px;">
+                <input type="checkbox" name="senior_friendly" id="senior_friendly" value="1" {% if filters.senior_friendly %}checked{% endif %} onchange="this.form.submit()">
+                <label for="senior_friendly" style="cursor: pointer; margin: 0; font-weight: 600;">👴 Senior-Friendly</label>
+            </div>
+
+            <div class="filter-group" style="display: flex; flex-direction: row; align-items: center; gap: 8px; padding-bottom: 8px;">
+                <input type="checkbox" name="wheelchair" id="wheelchair" value="1" {% if filters.wheelchair %}checked{% endif %} onchange="this.form.submit()">
+                <label for="wheelchair" style="cursor: pointer; margin: 0; font-weight: 600;">♿ Wheelchair</label>
+            </div>
+
+            <div style="display: flex; gap: 8px;">
+                <button type="submit" class="btn-primary" style="padding: 9px 18px;">Filter</button>
+                <a href="{{ url_for('destinations.list_destinations') }}" class="btn-outline" style="padding: 8px 14px;">Reset</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Destinations Grid -->
+{% if destinations %}
+    <div class="cards-grid">
+        {% for dest in destinations %}
+            <article class="card destination-card-item" data-name="{{ dest.name }}" data-city="{{ dest.city }}" data-state="{{ dest.state }}">
+                <div class="card-img-wrapper">
+                    <img src="{{ dest.image_url }}" alt="{{ dest.name }}" class="card-img" loading="lazy">
+                    <span class="badge-tag">{{ dest.category.replace('_', ' ') }}</span>
+                    {% if dest.country and dest.country != 'India' %}
+                        <span class="badge-country"><i class="fa-solid fa-earth-americas"></i> {{ dest.country }}</span>
+                    {% endif %}
+                    {% if dest.verified %}
+                        <span class="badge-verified"><i class="fa-solid fa-circle-check"></i> Verified</span>
+                    {% endif %}
+                </div>
+
+                <div class="card-body">
+                    <h3 class="card-title">{{ dest.name }}</h3>
+                    <div class="card-location">
+                        <i class="fa-solid fa-location-dot" style="color: var(--primary-color);"></i> {{ dest.city }}, {{ dest.state }}{% if dest.country and dest.country != 'India' %}, {{ dest.country }}{% endif %}
+                    </div>
+
+                    <p class="card-text">{{ dest.description }}</p>
+
+                    <div class="card-amenities">
+                        {% if dest.senior_priority_darshan %}
+                            <span class="amenity-pill"><i class="fa-solid fa-person-cane"></i> Senior Priority</span>
+                        {% endif %}
+                        {% if dest.wheelchair_accessible %}
+                            <span class="amenity-pill"><i class="fa-solid fa-wheelchair"></i> Wheelchair</span>
+                        {% endif %}
+                        {% if dest.battery_car_available %}
+                            <span class="amenity-pill"><i class="fa-solid fa-cart-shopping"></i> Battery Car</span>
+                        {% endif %}
+                        <span class="badge-pure-veg"><i class="fa-solid fa-hands-praying"></i> {{ dest.religion_tradition }}</span>
+                    </div>
+
+                    {% if dest.dress_code %}
+                        <div style="font-size: 0.82rem; color: #856404; background: #fff3cd; padding: 4px 8px; border-radius: 4px; margin-bottom: 12px;">
+                            <strong>Dress Code:</strong> {{ dest.dress_code[:45] }}...
+                        </div>
+                    {% endif %}
+
+                    <div class="card-footer">
+                        <div class="card-price">
+                            Hours: <strong>{{ dest.opening_hours.split('&')[0] if dest.opening_hours else 'Open Daily' }}</strong>
+                        </div>
+                        <a href="{{ url_for('destinations.destination_detail', dest_id=dest.id) }}" class="btn-primary" style="padding: 6px 12px; font-size: 0.88rem;">
+                            View Details &rarr;
+                        </a>
+                    </div>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+{% else %}
+    <div style="text-align: center; padding: 60px 20px; background: #ffffff; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+        <i class="fa-solid fa-magnifying-glass" style="font-size: 3rem; color: var(--accent-gold); margin-bottom: 16px;"></i>
+        <h3>No sacred destinations matched your filters</h3>
+        <p style="color: var(--text-muted); margin-bottom: 20px;">Try clearing your filters or choosing a different state or category.</p>
+        <a href="{{ url_for('destinations.list_destinations') }}" class="btn-primary">View All Destinations</a>
+    </div>
+{% endif %}
+
+<div style="margin-top: 24px; padding: 14px 20px; background: #fef9e7; border-left: 4px solid var(--accent-gold); border-radius: 4px; font-size: 0.9rem; color: #7d5a00;">
+    <i class="fa-solid fa-circle-info"></i> {{ disclaimer }}
+</div>
+{% endblock %}

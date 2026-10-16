@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Interactive Global Sacred Map - Yatra{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <div>
+        <h2><i class="fa-solid fa-map-location-dot" style="color: var(--primary-color);"></i> Global Sacred Geography & Pilgrimages</h2>
+        <p>Interactive pilgrimage map showing shrines, holy rivers, ghats, and spiritual circuits worldwide</p>
+    </div>
+</div>
+
+<!-- Map Filter Controls -->
+<div class="filter-card">
+    <div class="filter-row">
+        <div class="filter-group">
+            <label for="map-country-filter">Country</label>
+            <select id="map-country-filter">
+                <option value="">All Sacred Countries</option>
+                {% for c in countries %}
+                    <option value="{{ c }}">{{ c }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="map-state-filter">State / Region</label>
+            <select id="map-state-filter">
+                <option value="">All Regions</option>
+                {% for st in states %}
+                    <option value="{{ st }}">{{ st }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="map-category-filter">Category</label>
+            <select id="map-category-filter">
+                <option value="">All Categories</option>
+                {% for cat_val, cat_label in categories %}
+                    <option value="{{ cat_val }}">{{ cat_label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="filter-group" style="display: flex; flex-direction: row; align-items: center; gap: 8px; padding-bottom: 8px;">
+            <input type="checkbox" id="map-senior-filter">
+            <label for="map-senior-filter" style="cursor: pointer; margin: 0; font-weight: 600;">👴 Senior-Friendly Only</label>
+        </div>
+    </div>
+</div>
+
+<!-- Map Container -->
+<div style="background: #ffffff; border-radius: var(--radius-lg); border: 1px solid var(--border-color); overflow: hidden; box-shadow: var(--shadow-md); margin-bottom: 30px;">
+    <div id="pilgrimage-map" style="width: 100%; height: 600px;"></div>
+</div>
+
+<!-- Map Legend -->
+<div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px 24px; display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: center; font-size: 0.9rem;">
+    <span style="font-weight: 700; color: var(--text-muted);">Shrine Markers:</span>
+    <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: #c44d18; border-radius: 50%; display: inline-block;"></span> Temple</span>
+    <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: #117864; border-radius: 50%; display: inline-block;"></span> Sacred River / Ghat</span>
+    <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: #e67e22; border-radius: 50%; display: inline-block;"></span> Gurudwara</span>
+    <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: #27ae60; border-radius: 50%; display: inline-block;"></span> Mosque / Dargah</span>
+    <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: #8e44ad; border-radius: 50%; display: inline-block;"></span> Monastery</span>
+    <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: #2980b9; border-radius: 50%; display: inline-block;"></span> Church</span>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}My Pilgrimage Bookings - Yatra{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <div>
+        <h2><i class="fa-solid fa-ticket" style="color: var(--primary-color);"></i> My Pilgrimage Bookings</h2>
+        <p>Review reservations for verified ashrams, pure-veg hotels, and dedicated transport</p>
+    </div>
+</div>
+
+{% if bookings %}
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+        {% for b in bookings %}
+            <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 22px; box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                <div style="flex: 1; min-width: 280px;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                        <span class="badge-tag" style="position: static;">
+                            {{ b.booking_type|upper }}
+                        </span>
+                        <span style="font-size: 0.8rem; font-weight: 700; padding: 3px 10px; border-radius: 12px; background-color: {% if b.status == 'confirmed' %}#d4edda; color: #155724;{% elif b.status == 'cancelled' %}#f8d7da; color: #721c24;{% else %}#fff3cd; color: #856404;{% endif %}">
+                            {{ b.status|upper }}
+                        </span>
+                        <span style="font-size: 0.82rem; color: var(--text-muted);">
+                            Booking ID: #TT-{{ b.id }}
+                        </span>
+                    </div>
+
+                    {% if b.item %}
+                        <h3 style="font-size: 1.3rem; color: var(--secondary-color); margin-bottom: 4px;">
+                            {{ b.item.name or b.item.vehicle_type }}
+                        </h3>
+                    {% else %}
+                        <h3 style="font-size: 1.3rem; color: var(--secondary-color); margin-bottom: 4px;">
+                            Reservation #{{ b.id }}
+                        </h3>
+                    {% endif %}
+
+                    <div style="font-size: 0.92rem; color: var(--text-muted); margin-bottom: 8px;">
+                        <i class="fa-solid fa-calendar-days"></i> Dates: <strong>{{ b.start_date }}</strong> to <strong>{{ b.end_date }}</strong> • 
+                        <i class="fa-solid fa-users"></i> Pilgrims: <strong>{{ b.guests_count }}</strong>
+                    </div>
+
+                    {% if b.special_requests %}
+                        <div style="font-size: 0.88rem; background: #fdfbf7; padding: 8px 12px; border-radius: 4px; border-left: 3px solid var(--accent-gold); color: var(--text-primary);">
+                            <strong>Accessibility & Requests:</strong> {{ b.special_requests }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div style="text-align: right; min-width: 160px;">
+                    <div style="font-size: 0.82rem; color: var(--text-muted);">Total Estimated Amount</div>
+                    <div style="font-size: 1.5rem; font-weight: 800; color: var(--primary-color); margin-bottom: 10px;">
+                        ₹{{ "{:,.0f}".format(b.total_amount) }}
+                    </div>
+
+                    {% if b.status != 'cancelled' %}
+                        <form action="{{ url_for('bookings.cancel_booking', booking_id=b.id) }}" method="POST" onsubmit="return confirm('Do you wish to cancel this booking?');">
+                            <button type="submit" class="btn-outline" style="padding: 6px 14px; font-size: 0.85rem; color: #dc3545; border-color: #dc3545;">
+                                Cancel Booking
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div style="text-align: center; padding: 60px 20px; background: #ffffff; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+        <i class="fa-solid fa-ticket-simple" style="font-size: 3rem; color: var(--accent-gold); margin-bottom: 16px;"></i>
+        <h3>No bookings made yet</h3>
+        <p style="color: var(--text-muted); margin-bottom: 24px;">Reserve pure-veg stays, ashrams, or dedicated cabs for your family.</p>
+        <div style="display: flex; gap: 12px; justify-content: center;">
+            <a href="{{ url_for('hotels.list_hotels') }}" class="btn-primary">Browse Ashrams & Stays</a>
+            <a href="{{ url_for('vehicles.list_vehicles') }}" class="btn-outline">Browse Vehicles</a>
+        </div>
+    </div>
+{% endif %}
+
+<div style="margin-top: 32px; padding: 14px 20px; background: #fef9e7; border-left: 4px solid var(--accent-gold); border-radius: 4px; font-size: 0.9rem; color: #7d5a00;">
+    <i class="fa-solid fa-circle-info"></i> {{ disclaimer }}
+</div>
+{% endblock %}

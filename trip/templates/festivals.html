@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Sacred Festival Calendar & Crowd Advisory - Yatra{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <div>
+        <h2><i class="fa-solid fa-calendar-star" style="color: var(--primary-color);"></i> Sacred Festivals & Seasonal Travel Planning</h2>
+        <p>Clearly dated spiritual gatherings, Maha Melas, and crowd management advisories</p>
+    </div>
+</div>
+
+<!-- Month Filter Bar -->
+<div class="filter-card">
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+        <span style="font-weight: 700; color: var(--text-muted); margin-right: 8px;">Filter by Month:</span>
+        <a href="{{ url_for('destinations.festivals') }}" class="amenity-pill" style="{% if not selected_month %}background-color: var(--primary-color); color: #fff; border-color: var(--primary-color);{% endif %} padding: 6px 14px; text-decoration: none;">All Year</a>
+        {% for m in ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'] %}
+            <a href="{{ url_for('destinations.festivals', month=m) }}" class="amenity-pill" style="{% if selected_month == m %}background-color: var(--primary-color); color: #fff; border-color: var(--primary-color);{% endif %} padding: 6px 14px; text-decoration: none;">{{ m }}</a>
+        {% endfor %}
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px;">
+    {% for f in festivals %}
+        <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 24px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                <h3 style="font-size: 1.3rem; color: var(--secondary-color);">{{ f.name }}</h3>
+                <span style="background-color: {% if f.crowd_level == 'Extremely Crowded' %}#f8d7da{% else %}#fff3cd{% endif %}; color: {% if f.crowd_level == 'Extremely Crowded' %}#721c24{% else %}#856404{% endif %}; padding: 4px 10px; border-radius: 4px; font-size: 0.78rem; font-weight: 700;">
+                    <i class="fa-solid fa-users"></i> {{ f.crowd_level }}
+                </span>
+            </div>
+
+            <div style="font-size: 0.95rem; color: var(--primary-color); font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-calendar-check"></i> {{ f.typical_dates_range }}
+                <span>• {{ f.city }}, {{ f.state }}</span>
+            </div>
+
+            <p style="font-size: 0.96rem; color: var(--text-primary); line-height: 1.6; margin-bottom: 16px; flex: 1;">
+                {{ f.description }}
+            </p>
+
+            <div style="background-color: var(--bg-parchment); border-left: 4px solid var(--accent-gold); padding: 12px; border-radius: 4px; margin-bottom: 16px; font-size: 0.88rem;">
+                <strong style="color: #8c5d15;"><i class="fa-solid fa-fire-burner"></i> Key Rituals:</strong>
+                <p style="margin-top: 4px; color: var(--text-primary);">{{ f.key_rituals }}</p>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid #eee;">
+                <span style="font-size: 0.85rem; color: var(--text-muted);">Shrine: <strong>{{ f.destination_name }}</strong></span>
+                <a href="{{ url_for('destinations.destination_detail', dest_id=f.destination_id) }}" class="btn-outline" style="padding: 4px 12px; font-size: 0.85rem;">
+                    Shrine Guide &rarr;
+                </a>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

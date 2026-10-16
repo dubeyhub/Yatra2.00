@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Spiritual Serenity - Yatra{% endblock %}
+
+{% block content %}
+<div style="text-align: center; padding: 80px 20px;">
+    <div style="font-size: 3.5rem; color: var(--accent-gold); margin-bottom: 12px;"><i class="fa-solid fa-om"></i></div>
+    <h2 style="font-size: 2rem; color: var(--secondary-color); margin-bottom: 12px;">Spiritual Pause (500)</h2>
+    <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 500px; margin: 0 auto 24px auto;">
+        Our pilgrimage service experienced a momentary stillness. Please refresh the page or return to the main sacred portal.
+    </p>
+    <a href="{{ url_for('destinations.index') }}" class="btn-primary" style="padding: 10px 24px;">
+        Return to Home &rarr;
+    </a>
+</div>
+{% endblock %}

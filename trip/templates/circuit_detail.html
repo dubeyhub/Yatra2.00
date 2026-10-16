@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ circuit.name }} - Circuit Itinerary & Stops - Yatra{% endblock %}
+
+{% block content %}
+<div class="detail-header">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+        <div>
+            <span class="badge-tag" style="position: static; margin-bottom: 8px;">{{ circuit.states_covered }}</span>
+            <h1 style="font-size: 2.2rem; color: var(--secondary-color); margin-top: 6px;">{{ circuit.name }}</h1>
+            <div style="font-size: 1.05rem; color: var(--text-muted); margin-top: 4px;">
+                <strong>Recommended Duration:</strong> {{ circuit.total_days_recommended }} Days • <strong>Theme:</strong> {{ circuit.theme }}
+            </div>
+        </div>
+
+        <div>
+            <a href="{{ url_for('trips.planner', circuit_id=circuit.id) }}" class="btn-primary" style="font-size: 1.1rem; padding: 12px 28px;">
+                <i class="fa-solid fa-calendar-check"></i> Generate My Itinerary
+            </a>
+        </div>
+    </div>
+
+    <img src="{{ circuit.image_url }}" alt="{{ circuit.name }}" class="detail-banner" style="height: 320px;">
+
+    <p style="font-size: 1.15rem; line-height: 1.7; color: var(--text-primary);">
+        {{ circuit.description }}
+    </p>
+</div>
+
+<!-- Day-by-Day Stops Timeline -->
+<div class="planner-card">
+    <h2 style="margin-bottom: 24px; font-size: 1.6rem;">
+        <i class="fa-solid fa-list-ol" style="color: var(--primary-color);"></i> Circuit Daily Stops & Holy Shrines
+    </h2>
+
+    {% for stop in circuit.stops %}
+        <div class="day-timeline-item">
+            <div class="day-badge-marker">{{ stop.day_number }}</div>
+
+            <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+                    <div>
+                        <h3 style="font-size: 1.3rem; color: var(--secondary-color);">Day {{ stop.day_number }}: {{ stop.destination_name }}</h3>
+                        <div style="font-size: 0.9rem; color: var(--text-muted);">
+                            <i class="fa-solid fa-location-dot" style="color: var(--primary-color);"></i> {{ stop.city }}, {{ stop.state }}
+                        </div>
+                    </div>
+
+                    <a href="{{ url_for('destinations.destination_detail', dest_id=stop.destination_id) }}" class="btn-outline" style="padding: 4px 12px; font-size: 0.85rem;">
+                        View Shrine Guide &rarr;
+                    </a>
+                </div>
+
+                <p style="font-size: 1rem; color: var(--text-primary); margin-bottom: 12px; line-height: 1.6;">
+                    {{ stop.notes }}
+                </p>
+
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    {% if stop.senior_priority_darshan %}
+                        <span class="amenity-pill"><i class="fa-solid fa-person-cane"></i> Senior Priority Darshan</span>
+                    {% endif %}
+                    {% if stop.battery_car_available %}
+                        <span class="amenity-pill"><i class="fa-solid fa-cart-shopping"></i> Battery Car at Gate</span>
+                    {% endif %}
+                    {% if stop.wheelchair_accessible %}
+                        <span class="amenity-pill"><i class="fa-solid fa-wheelchair"></i> Wheelchair Access</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <div style="text-align: center; margin-top: 32px;">
+        <a href="{{ url_for('trips.planner', circuit_id=circuit.id) }}" class="btn-primary" style="font-size: 1.15rem; padding: 12px 36px;">
+            Customize This Circuit in Multi-Day Planner &rarr;
+        </a>
+    </div>
+</div>
+{% endblock %}

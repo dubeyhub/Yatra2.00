@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Yatra - Global Sacred Pilgrimages & Spiritual Journeys{% endblock %}</title>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Leaflet Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Yatra Main CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+    <!-- Verified & Sample Pricing Top Banner -->
+    <aside class="disclaimer-banner" role="complementary" aria-label="Pricing and Etiquette Notice">
+        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+        <span><strong>Pilgrim Notice:</strong> Sample prices are estimated for planning purposes. Opening hours, darshan rules, and visitor requirements are verified with sacred shrine trusts worldwide.</span>
+    </aside>
+
+    <!-- Navigation Header -->
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="{{ url_for('destinations.index') }}" class="brand-logo" aria-label="Yatra Home">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-om"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>Yatra</h1>
+                    <span>Global Sacred Pilgrimages</span>
+                </div>
+            </a>
+
+            <button class="mobile-toggle" aria-label="Toggle navigation menu" style="display: none;">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="{{ url_for('destinations.list_destinations') }}" class="nav-link"><i class="fa-solid fa-gopuram"></i> Destinations</a></li>
+                    <li><a href="{{ url_for('destinations.circuits') }}" class="nav-link"><i class="fa-solid fa-route"></i> Circuits</a></li>
+                    <li><a href="{{ url_for('trips.planner') }}" class="nav-link"><i class="fa-solid fa-calendar-check"></i> Trip Planner</a></li>
+                    <li><a href="{{ url_for('trips.budget') }}" class="nav-link"><i class="fa-solid fa-calculator"></i> Budget</a></li>
+                    <li><a href="{{ url_for('destinations.map_view') }}" class="nav-link"><i class="fa-solid fa-map-location-dot"></i> Sacred Map</a></li>
+                    <li><a href="{{ url_for('hotels.list_hotels') }}" class="nav-link"><i class="fa-solid fa-hotel"></i> Ashrams & Stays</a></li>
+                    <li><a href="{{ url_for('restaurants.list_restaurants') }}" class="nav-link"><i class="fa-solid fa-bowl-food"></i> Prasad & Dining</a></li>
+                    <li><a href="{{ url_for('vehicles.list_vehicles') }}" class="nav-link"><i class="fa-solid fa-van-shuttle"></i> Vehicles</a></li>
+
+                    <!-- Site-Wide Language Translator Dropdown -->
+                    <li class="yatra-lang-item">
+                        <div class="yatra-lang-wrapper">
+                            <button type="button" class="yatra-lang-btn" id="yatraLangBtn" aria-label="Select Language">
+                                <i class="fa-solid fa-language"></i> <span id="currentLangLabel">Language</span> <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; margin-left: 2px;"></i>
+                            </button>
+                            <div class="yatra-lang-dropdown" id="yatraLangDropdown">
+                                <a href="javascript:void(0)" onclick="changeYatraLanguage('en', 'English')"><span class="lang-flag">🌐</span> English</a>
+                                <a href="javascript:void(0)" onclick="changeYatraLanguage('hi', 'हिन्दी')"><span class="lang-flag">🇮🇳</span> हिन्दी (Hindi)</a>
+                                <a href="javascript:void(0)" onclick="changeYatraLanguage('es', 'Español')"><span class="lang-flag">🇪🇸</span> Español</a>
+                                <a href="javascript:void(0)" onclick="changeYatraLanguage('fr', 'Français')"><span class="lang-flag">🇫🇷</span> Français</a>
+                                <a href="javascript:void(0)" onclick="changeYatraLanguage('ja', '日本語')"><span class="lang-flag">🇯🇵</span> 日本語</a>
+                                <a href="javascript:void(0)" onclick="changeYatraLanguage('ar', 'العربية')"><span class="lang-flag">🇸🇦</span> العربية</a>
+                                <a href="javascript:void(0)" onclick="changeYatraLanguage('bn', 'বাংলা')"><span class="lang-flag">🇮🇳</span> বাংলা (Bengali)</a>
+                                <a href="javascript:void(0)" onclick="changeYatraLanguage('ta', 'தமிழ்')"><span class="lang-flag">🇮🇳</span> தமிழ் (Tamil)</a>
+                                <a href="javascript:void(0)" onclick="changeYatraLanguage('te', 'తెలుగు')"><span class="lang-flag">🇮🇳</span> తెలుగు (Telugu)</a>
+                            </div>
+                        </div>
+                    </li>
+                    
+                    {% if current_user %}
+                        {% if current_user.role == 'admin' %}
+                            <li><a href="{{ url_for('admin.dashboard') }}" class="nav-link" style="color: #c44d18;"><i class="fa-solid fa-shield-halved"></i> Admin</a></li>
+                        {% endif %}
+                        <li><a href="{{ url_for('trips.my_trips') }}" class="nav-link"><i class="fa-solid fa-suitcase"></i> My Trips</a></li>
+                        <li><a href="{{ url_for('bookings.my_bookings') }}" class="nav-link"><i class="fa-solid fa-ticket"></i> Bookings</a></li>
+                        <li>
+                            <a href="{{ url_for('auth.profile') }}" class="user-badge">
+                                <i class="fa-solid fa-user-circle"></i> {{ current_user.full_name.split(' ')[0] }}
+                            </a>
+                        </li>
+                        <li><a href="{{ url_for('auth.logout') }}" class="nav-link" title="Sign Out"><i class="fa-solid fa-arrow-right-from-bracket"></i></a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('auth.login') }}" class="nav-link"><i class="fa-solid fa-right-to-bracket"></i> Sign In</a></li>
+                        <li><a href="{{ url_for('auth.register') }}" class="nav-cta">Register</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Flash Messages -->
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        <div>
+                            {% if category == 'success' %}<i class="fa-solid fa-circle-check"></i>
+                            {% elif category == 'danger' %}<i class="fa-solid fa-triangle-warning"></i>
+                            {% else %}<i class="fa-solid fa-circle-info"></i>
+                            {% endif %}
+                            <span style="margin-left: 8px;">{{ message }}</span>
+                        </div>
+                        <button type="button" onclick="this.parentElement.remove()" style="background: none; border: none; cursor: pointer; font-size: 1.1rem; color: inherit;">&times;</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Page Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Floating Yatra AI Chat Widget -->
+    <button id="yatraChatToggle" class="yatra-chat-toggle" aria-label="Open Yatra AI Pilgrim Guide">
+        <div class="chat-toggle-pulse"></div>
+        <div class="chat-toggle-icon">
+            <i class="fa-solid fa-hands-praying"></i>
+        </div>
+        <span class="chat-toggle-label">Ask Yatra AI</span>
+        <span class="chat-badge-dot"></span>
+    </button>
+
+    <!-- Yatra AI Chat Modal Dialog -->
+    <div id="yatraChatModal" class="yatra-chat-modal" role="dialog" aria-modal="true" aria-label="Yatra AI Pilgrim Guide" style="display: none;">
+        <!-- Chat Header -->
+        <div class="yatra-chat-header">
+            <div class="chat-header-info">
+                <div class="chat-header-avatar">
+                    <i class="fa-solid fa-om"></i>
+                </div>
+                <div>
+                    <h4>Yatra AI Guide</h4>
+                    <div class="chat-status">
+                        <span class="status-indicator"></span>
+                        <span>Reverent Global Pilgrim Guide</span>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-header-actions">
+                <button type="button" class="chat-head-btn" id="yatraChatClear" title="Restart Conversation">
+                    <i class="fa-solid fa-arrow-rotate-left"></i>
+                </button>
+                <button type="button" class="chat-head-btn" id="yatraChatClose" title="Close Chat">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Quick Suggestion Chips -->
+        <div class="yatra-chat-suggestions">
+            <button type="button" class="suggestion-chip" onclick="sendYatraSuggestion('What is the sacred dress code for Tirupati Balaji and Vatican City?')">
+                <i class="fa-solid fa-shirt"></i> Dress Codes
+            </button>
+            <button type="button" class="suggestion-chip" onclick="sendYatraSuggestion('Are wheelchair facilities and battery cars available for elderly pilgrims at Kedarnath and Kashi?')">
+                <i class="fa-solid fa-wheelchair"></i> Senior Access
+            </button>
+            <button type="button" class="suggestion-chip" onclick="sendYatraSuggestion('What are the aarti timings at Haridwar Ganga Ghat and Bodh Gaya meditation hours?')">
+                <i class="fa-solid fa-bell"></i> Aarti Timings
+            </button>
+            <button type="button" class="suggestion-chip" onclick="sendYatraSuggestion('Where can we find pure sattvic prasad or free community langar meals?')">
+                <i class="fa-solid fa-bowl-rice"></i> Sattvic Meals
+            </button>
+        </div>
+
+        <!-- Messages Container -->
+        <div id="yatraChatMessages" class="yatra-chat-messages">
+            <div class="yatra-msg yatra-msg-assistant">
+                <div class="msg-avatar"><i class="fa-solid fa-hands-praying"></i></div>
+                <div class="msg-content">
+                    <div class="msg-sender">Yatra AI</div>
+                    <div class="msg-text">
+                        Namaste & Welcome 🙏 I am <strong>Yatra AI</strong>, your reverent spiritual companion. 
+                        <br><br>
+                        Ask me anything about sacred shrines worldwide, darshan timings, dress codes, aarti schedules, wheelchair & senior assistance, or pure satvik dining.
+                        <br><br>
+                        <em>आप हिन्दी में भी प्रश्न पूछ सकते हैं।</em>
+                    </div>
+                    <div class="msg-time">Just now</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Typing Indicator -->
+        <div id="yatraTypingIndicator" class="yatra-typing-indicator" style="display: none;">
+            <span>Yatra AI is contemplating sacred guidance</span>
+            <span class="typing-dots">
+                <span>.</span><span>.</span><span>.</span>
+            </span>
+        </div>
+
+        <!-- Chat Input Form -->
+        <form id="yatraChatForm" class="yatra-chat-input-form">
+            <input type="text" id="yatraChatInput" class="yatra-chat-input" placeholder="Ask about dress codes, aarti, access... / सवाल पूछें..." autocomplete="off" required>
+            <button type="submit" id="yatraChatSendBtn" class="yatra-chat-send-btn" aria-label="Send Message">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </form>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div>
+                <h3>Yatra</h3>
+                <p style="font-size: 0.92rem; line-height: 1.6; color: #bdc3c7; margin-bottom: 16px;">
+                    Dedicated to pilgrims, families, and spiritual seekers discovering the world's and India's profound cultural and religious heritage with respect, accessibility, and clarity.
+                </p>
+                <div style="display: flex; gap: 12px; font-size: 1.2rem; color: var(--accent-gold);">
+                    <i class="fa-solid fa-hands-praying" title="Universal Bhakti"></i>
+                    <i class="fa-solid fa-wheelchair" title="Senior & Wheelchair Friendly"></i>
+                    <i class="fa-solid fa-bowl-rice" title="Pure Veg & Sattvic"></i>
+                    <i class="fa-solid fa-peace" title="Interfaith Respect"></i>
+                </div>
+            </div>
+
+            <div>
+                <h3>Global & Indian Circuits</h3>
+                <ul>
+                    <li><a href="{{ url_for('destinations.list_destinations', country='Vatican City') }}">Vatican City (St. Peter's)</a></li>
+                    <li><a href="{{ url_for('destinations.list_destinations', country='Nepal') }}">Nepal (Lumbini & Pashupatinath)</a></li>
+                    <li><a href="{{ url_for('destinations.list_destinations', country='Israel') }}">Jerusalem (Holy Sepulchre)</a></li>
+                    <li><a href="{{ url_for('destinations.list_destinations', country='Saudi Arabia') }}">Saudi Arabia (Mecca Kaaba)</a></li>
+                    <li><a href="{{ url_for('destinations.list_destinations', country='Japan') }}">Japan (Fushimi Inari-Taisha)</a></li>
+                    <li><a href="{{ url_for('destinations.list_destinations', country='Spain') }}">Spain (Santiago de Compostela)</a></li>
+                    <li><a href="{{ url_for('destinations.list_destinations', state='Uttar Pradesh') }}">Uttar Pradesh (Kashi, Mathura, Ayodhya)</a></li>
+                    <li><a href="{{ url_for('destinations.list_destinations', state='Uttarakhand') }}">Uttarakhand (Kedarnath, Badrinath)</a></li>
+                    <li><a href="{{ url_for('destinations.list_destinations', state='Punjab') }}">Punjab (Golden Temple Amritsar)</a></li>
+                    <li><a href="{{ url_for('destinations.list_destinations', state='Tamil Nadu') }}">Tamil Nadu (Rameswaram, Madurai)</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h3>Specialized Features</h3>
+                <ul>
+                    <li><a href="{{ url_for('trips.planner') }}">Multi-Day Pilgrimage Planner</a></li>
+                    <li><a href="{{ url_for('trips.budget') }}">Itemized Pilgrimage Budget Calculator</a></li>
+                    <li><a href="{{ url_for('destinations.map_view') }}">Interactive Global Shrines Map</a></li>
+                    <li><a href="{{ url_for('destinations.festivals') }}">Festival Calendar & Crowd Advisory</a></li>
+                    <li><a href="{{ url_for('destinations.list_destinations', senior_friendly='1') }}">Senior-Friendly Darshan Filters</a></li>
+                    <li><a href="{{ url_for('restaurants.list_restaurants', is_sattvic='1') }}">Sattvic Bhojan & Temple Prasad Guide</a></li>
+                    <li><a href="{{ url_for('vehicles.list_vehicles') }}">Pilgrimage Tempo Travellers & Cabs</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h3>Visitor Etiquette & Seva</h3>
+                <p style="font-size: 0.88rem; color: #bdc3c7; line-height: 1.6; margin-bottom: 12px;">
+                    We encourage all pilgrims to uphold sacred dress codes, preserve silence in sanctums, and prioritize the comfort of elderly parents and devotees worldwide.
+                </p>
+                <div style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 6px; font-size: 0.84rem; color: #f1c40f;">
+                    <i class="fa-solid fa-headset"></i> Pilgrim Assistance Helpline: +91 1800 200 108
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 Yatra Pilgrimages. Respectful, inclusive information for all traditions and communities worldwide.</p>
+        </div>
+    </footer>
+
+    <!-- Hidden Google Translate Element -->
+    <div id="google_translate_element" style="display:none;"></div>
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,hi,es,fr,ja,ar,bn,ta,te',
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Core JS -->
+    <script src="{{ url_for('static', filename='js/filters.js') }}"></script>
+
+    <!-- Google Translate Switcher & Yatra AI Chatbot Script -->
+    <script>
+        // Language Switcher Handler
+        function changeYatraLanguage(langCode, label) {
+            var labelEl = document.getElementById('currentLangLabel');
+            if (labelEl) labelEl.textContent = label;
+            var dropdown = document.getElementById('yatraLangDropdown');
+            if (dropdown) dropdown.classList.remove('show');
+
+            var host = window.location.hostname;
+            document.cookie = "googtrans=/en/" + langCode + "; path=/;";
+            document.cookie = "googtrans=/en/" + langCode + "; domain=" + host + "; path=/;";
+
+            var select = document.querySelector(".goog-te-combo");
+            if (select) {
+                select.value = langCode;
+                select.dispatchEvent(new Event("change"));
+            } else {
+                window.location.reload();
+            }
+        }
+
+        // Toggle language dropdown
+        document.addEventListener('DOMContentLoaded', function() {
+            var langBtn = document.getElementById('yatraLangBtn');
+            var langDropdown = document.getElementById('yatraLangDropdown');
+            if (langBtn && langDropdown) {
+                langBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    langDropdown.classList.toggle('show');
+                });
+                document.addEventListener('click', function() {
+                    langDropdown.classList.remove('show');
+                });
+            }
+        });
+
+        // Yatra AI Chatbot
+        (function() {
+            let yatraConversationHistory = [];
+
+            const chatToggle = document.getElementById('yatraChatToggle');
+            const chatModal = document.getElementById('yatraChatModal');
+            const chatClose = document.getElementById('yatraChatClose');
+            const chatClear = document.getElementById('yatraChatClear');
+            const chatForm = document.getElementById('yatraChatForm');
+            const chatInput = document.getElementById('yatraChatInput');
+            const chatMessages = document.getElementById('yatraChatMessages');
+            const typingIndicator = document.getElementById('yatraTypingIndicator');
+
+            if (chatToggle && chatModal) {
+                chatToggle.addEventListener('click', function () {
+                    const isHidden = chatModal.style.display === 'none' || chatModal.style.display === '';
+                    chatModal.style.display = isHidden ? 'flex' : 'none';
+                    if (isHidden) {
+                        setTimeout(() => chatInput.focus(), 100);
+                        scrollToBottom();
+                    }
+                });
+
+                chatClose.addEventListener('click', function () {
+                    chatModal.style.display = 'none';
+                });
+
+                chatClear.addEventListener('click', function () {
+                    yatraConversationHistory = [];
+                    chatMessages.innerHTML = `
+                        <div class="yatra-msg yatra-msg-assistant">
+                            <div class="msg-avatar"><i class="fa-solid fa-hands-praying"></i></div>
+                            <div class="msg-content">
+                                <div class="msg-sender">Yatra AI</div>
+                                <div class="msg-text">
+                                    Namaste 🙏 Conversation cleared. How may I guide your spiritual pilgrimage today?
+                                </div>
+                                <div class="msg-time">Just now</div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                chatForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const text = chatInput.value.trim();
+                    if (!text) return;
+                    submitYatraMessage(text);
+                    chatInput.value = '';
+                });
+            }
+
+            window.sendYatraSuggestion = function(text) {
+                if (chatModal.style.display === 'none' || chatModal.style.display === '') {
+                    chatModal.style.display = 'flex';
+                }
+                submitYatraMessage(text);
+            };
+
+            function submitYatraMessage(text) {
+                appendUserMessage(text);
+                showTyping(true);
+
+                fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: text,
+                        history: yatraConversationHistory
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    showTyping(false);
+                    if (data.reply) {
+                        appendAssistantMessage(data.reply);
+                        yatraConversationHistory.push({ role: 'user', content: text });
+                        yatraConversationHistory.push({ role: 'assistant', content: data.reply });
+                    } else if (data.error) {
+                        appendAssistantMessage("Namaste 🙏 We encountered an issue: " + data.error);
+                    }
+                })
+                .catch(err => {
+                    showTyping(false);
+                    appendAssistantMessage("Namaste 🙏 I am unable to connect to the pilgrimage service at the moment. Please try again.");
+                });
+            }
+
+            function appendUserMessage(text) {
+                const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'yatra-msg yatra-msg-user';
+                msgDiv.innerHTML = `
+                    <div class="msg-content">
+                        <div class="msg-text">${escapeHtml(text)}</div>
+                        <div class="msg-time">${time}</div>
+                    </div>
+                `;
+                chatMessages.appendChild(msgDiv);
+                scrollToBottom();
+            }
+
+            function appendAssistantMessage(rawText) {
+                const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const formatted = formatAssistantText(rawText);
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'yatra-msg yatra-msg-assistant';
+                msgDiv.innerHTML = `
+                    <div class="msg-avatar"><i class="fa-solid fa-hands-praying"></i></div>
+                    <div class="msg-content">
+                        <div class="msg-sender">Yatra AI</div>
+                        <div class="msg-text">${formatted}</div>
+                        <div class="msg-time">${time}</div>
+                    </div>
+                `;
+                chatMessages.appendChild(msgDiv);
+                scrollToBottom();
+            }
+
+            function formatAssistantText(text) {
+                let formatted = escapeHtml(text);
+                formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
+                formatted = formatted.replace(/\n\n/g, '<br><br>');
+                formatted = formatted.replace(/\n/g, '<br>');
+                return formatted;
+            }
+
+            function escapeHtml(str) {
+                return str
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+
+            function showTyping(show) {
+                if (typingIndicator) {
+                    typingIndicator.style.display = show ? 'flex' : 'none';
+                    scrollToBottom();
+                }
+            }
+
+            function scrollToBottom() {
+                if (chatMessages) {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+            }
+        })();
+    </script>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

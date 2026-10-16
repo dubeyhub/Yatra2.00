@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Sacred Pilgrimage Circuits - Yatra{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <div>
+        <h2><i class="fa-solid fa-route" style="color: var(--primary-color);"></i> Sacred Pilgrimage Circuits</h2>
+        <p>Curated multi-day pilgrimage trails across India's holiest traditions and geography</p>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 28px;">
+    {% for circuit in circuits %}
+        <div class="card">
+            <div class="card-img-wrapper">
+                <img src="{{ circuit.image_url }}" alt="{{ circuit.name }}" class="card-img">
+                <span class="badge-tag">⏱ {{ circuit.total_days_recommended }} Days</span>
+            </div>
+
+            <div class="card-body">
+                <h3 class="card-title">{{ circuit.name }}</h3>
+                <div class="card-location">
+                    <i class="fa-solid fa-map"></i> States: {{ circuit.states_covered }}
+                </div>
+
+                <div style="font-size: 0.88rem; color: var(--accent-teal); font-weight: 700; margin-bottom: 8px;">
+                    Theme: {{ circuit.theme }}
+                </div>
+
+                <p class="card-text">{{ circuit.description }}</p>
+
+                <div class="card-footer">
+                    <a href="{{ url_for('destinations.circuit_detail', identifier=circuit.slug) }}" class="btn-outline">
+                        View Itinerary Stops &rarr;
+                    </a>
+                    <a href="{{ url_for('trips.planner', circuit_id=circuit.id) }}" class="btn-primary">
+                        Plan Circuit
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

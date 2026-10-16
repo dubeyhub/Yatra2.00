@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Book {{ vehicle.vehicle_type }} - Yatra{% endblock %}
+
+{% block content %}
+<div class="detail-header">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+        <div>
+            <span class="badge-tag" style="position: static; margin-bottom: 8px;">Capacity: {{ vehicle.capacity }} Passengers</span>
+            <h1 style="font-size: 2rem; color: var(--secondary-color); margin-top: 6px;">{{ vehicle.vehicle_type }}</h1>
+            <p style="color: var(--text-muted);">Dedicated pilgrimage transport with certified courteous driver</p>
+        </div>
+        <div style="text-align: right;">
+            <div style="font-size: 1.8rem; font-weight: 800; color: var(--primary-color);">₹{{ vehicle.price_per_day|int }} <span style="font-size: 0.95rem; font-weight: normal; color: var(--text-muted);">/ day</span></div>
+            <div style="font-size: 0.8rem; color: #888;">Sample Estimated Daily Tariff</div>
+        </div>
+    </div>
+</div>
+
+<div class="detail-grid">
+    <!-- Left Column: Vehicle Features -->
+    <div>
+        <div class="info-card">
+            <h3><i class="fa-solid fa-car" style="color: var(--primary-color);"></i> Vehicle Details & Senior Care</h3>
+            <img src="{{ vehicle.image_url }}" alt="{{ vehicle.vehicle_type }}" style="width: 100%; height: 260px; object-fit: cover; border-radius: var(--radius-md); margin-bottom: 16px;">
+            <p style="font-size: 1.05rem; line-height: 1.7; margin-bottom: 20px;">{{ vehicle.features }}</p>
+
+            <div style="background: #e8f4fd; border-left: 4px solid #0b69a3; padding: 14px; border-radius: 4px; margin-bottom: 16px;">
+                <strong style="color: #0b69a3;"><i class="fa-solid fa-person-cane"></i> Senior-Friendly Travel Promise:</strong>
+                <ul style="margin-top: 6px; padding-left: 20px; font-size: 0.92rem; color: #1c2833;">
+                    <li>Smooth suspension tuned for gentle driving on hill roads and highways.</li>
+                    <li>Low entry footboard or portable step stool for effortless boarding by elders.</li>
+                    <li>Comfort stops every 2 to 2.5 hours at hygienic restaurants with clean washrooms.</li>
+                    <li>Devotional audio playback (bhajans, stotras) available on request.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Booking Inquiry Form -->
+    <div>
+        <div class="info-card" style="border-top: 4px solid var(--primary-color);">
+            <h3 style="color: var(--primary-color);"><i class="fa-solid fa-clipboard-check"></i> Book Vehicle / Cab</h3>
+            
+            <form action="{{ url_for('bookings.create_booking') }}" method="POST">
+                <input type="hidden" name="booking_type" value="vehicle">
+                <input type="hidden" name="reference_id" value="{{ vehicle.id }}">
+                <input type="hidden" name="total_amount" value="{{ vehicle.price_per_day * 3 }}">
+
+                <div style="margin-bottom: 14px;">
+                    <label style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">Pickup Date *</label>
+                    <input type="date" name="start_date" required style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                </div>
+
+                <div style="margin-bottom: 14px;">
+                    <label style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">Return Date *</label>
+                    <input type="date" name="end_date" required style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                </div>
+
+                <div style="margin-bottom: 14px;">
+                    <label style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">Number of Passengers *</label>
+                    <input type="number" name="guests_count" min="1" max="{{ vehicle.capacity }}" value="2" required style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                </div>
+
+                <div style="margin-bottom: 18px;">
+                    <label style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">Pickup City & Circuit Details</label>
+                    <textarea name="special_requests" rows="3" placeholder="e.g. Pickup from Varanasi Airport, visiting Kashi, Ayodhya, and Prayagraj. Please arrange elderly step stool." style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);"></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 1.05rem;">
+                    Confirm Transport Booking
+                </button>
+            </form>
+
+            <div style="font-size: 0.8rem; color: #777; margin-top: 12px; text-align: center;">
+                <i class="fa-solid fa-shield"></i> Chauffeur details and vehicle contact sent 24 hours before pickup.
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 24px; padding: 14px 20px; background: #fef9e7; border-left: 4px solid var(--accent-gold); border-radius: 4px; font-size: 0.9rem; color: #7d5a00;">
+    <i class="fa-solid fa-circle-info"></i> {{ disclaimer }}
+</div>
+{% endblock %}

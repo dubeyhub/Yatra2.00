@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if destination %}Edit {{ destination.name }}{% else %}Add Destination{% endif %} - Admin - Yatra{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <div>
+        <h2><i class="fa-solid fa-pen-to-square" style="color: var(--primary-color);"></i> {% if destination %}Edit Destination: {{ destination.name }}{% else %}Add New Sacred Destination{% endif %}</h2>
+        <p>Ensure verified information, respectful terminology, and accessibility flags</p>
+    </div>
+    <div>
+        <a href="{{ url_for('admin.manage_destinations') }}" class="btn-outline">&larr; Back to Destinations</a>
+    </div>
+</div>
+
+<div class="planner-card">
+    <form action="{% if destination %}{{ url_for('admin.edit_destination', dest_id=destination.id) }}{% else %}{{ url_for('admin.create_destination') }}{% endif %}" method="POST">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-bottom: 20px;">
+            <div>
+                <label style="display: block; font-weight: 700; margin-bottom: 4px;">Destination Name *</label>
+                <input type="text" name="name" value="{{ destination.name if destination else '' }}" required style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+            </div>
+
+            <div>
+                <label style="display: block; font-weight: 700; margin-bottom: 4px;">Country *</label>
+                <select name="country" required style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                    {% for c in countries %}
+                        <option value="{{ c }}" {% if destination and destination.country == c %}selected{% elif not destination and c == 'India' %}selected{% endif %}>{{ c }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label style="display: block; font-weight: 700; margin-bottom: 4px;">City *</label>
+                <input type="text" name="city" value="{{ destination.city if destination else '' }}" required style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+            </div>
+
+            <div>
+                <label style="display: block; font-weight: 700; margin-bottom: 4px;">State / Province / Region *</label>
+                <input type="text" name="state" value="{{ destination.state if destination else '' }}" required placeholder="e.g. Uttar Pradesh, Rome, Lumbini" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+            </div>
+
+            <div>
+                <label style="display: block; font-weight: 700; margin-bottom: 4px;">Category *</label>
+                <select name="category" required style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                    {% for cat_val, cat_label in categories %}
+                        <option value="{{ cat_val }}" {% if destination and destination.category == cat_val %}selected{% endif %}>{{ cat_label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label style="display: block; font-weight: 700; margin-bottom: 4px;">Religious Tradition *</label>
+                <select name="religion_tradition" required style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                    {% for rel in religions %}
+                        <option value="{{ rel }}" {% if destination and destination.religion_tradition == rel %}selected{% endif %}>{{ rel }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label style="display: block; font-weight: 700; margin-bottom: 4px;">Best Time to Visit</label>
+                <input type="text" name="best_time_to_visit" value="{{ destination.best_time_to_visit if destination else 'October to March' }}" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+            </div>
+        </div>
+
+        <div style="margin-bottom: 18px;">
+            <label style="display: block; font-weight: 700; margin-bottom: 4px;">Description *</label>
+            <textarea name="description" rows="3" required style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">{{ destination.description if destination else '' }}</textarea>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px;">
+            <div>
+                <label style="display: block; font-weight: 700; margin-bottom: 4px;">Sacred History & Architecture</label>
+                <textarea name="history" rows="3" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">{{ destination.history if destination else '' }}</textarea>
+            </div>
+            <div>
+                <label style="display: block; font-weight: 700; margin-bottom: 4px;">Spiritual Significance</label>
+                <textarea name="significance" rows="3" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">{{ destination.significance if destination else '' }}</textarea>
+            </div>
+        </div>
+
+        <!-- Religious site details & verification -->
+        <h3 style="font-size: 1.25rem; color: var(--secondary-color); margin: 24px 0 14px 0; border-top: 1px solid #eee; padding-top: 18px;">
+            <i class="fa-solid fa-clock"></i> Timings, Etiquette & Accessibility
+        </h3>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 18px;">
+            <div>
+                <label style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">Opening Hours</label>
+                <input type="text" name="opening_hours" value="{{ destination.opening_hours if destination else '06:00 AM - 09:00 PM' }}" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+            </div>
+            <div>
+                <label style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">Morning Aarti</label>
+                <input type="text" name="morning_aarti_time" value="{{ destination.morning_aarti_time if destination else '06:00 AM' }}" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+            </div>
+            <div>
+                <label style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">Evening Aarti</label>
+                <input type="text" name="evening_aarti_time" value="{{ destination.evening_aarti_time if destination else '07:00 PM' }}" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+            </div>
+            <div>
+                <label style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">Walking Distance (meters)</label>
+                <input type="number" name="walking_distance_meters" value="{{ destination.walking_distance_meters if destination else 150 }}" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px;">
+            <div>
+                <label style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">Dress Code</label>
+                <input type="text" name="dress_code" value="{{ destination.dress_code if destination else 'Modest traditional Indian clothing' }}" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+            </div>
+            <div>
+                <label style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">Footwear Rules</label>
+                <input type="text" name="footwear_rules" value="{{ destination.footwear_rules if destination else 'Deposit shoes at temple shoe counter' }}" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+            </div>
+            <div>
+                <label style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">Phone & Camera Rules</label>
+                <input type="text" name="phone_camera_rules" value="{{ destination.phone_camera_rules if destination else 'Prohibited inside sanctum; lockers available' }}" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+            </div>
+            <div>
+                <label style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">Sample Entry & Pooja Fees</label>
+                <input type="text" name="entry_fee_info" value="{{ destination.entry_fee_info if destination else 'Entry is Free. Sample Prasad Box: ₹50 - ₹100.' }}" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 24px; padding: 12px; background: #fdfaf6; border-radius: 4px;">
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                <input type="checkbox" name="wheelchair_accessible" value="1" {% if destination and destination.wheelchair_accessible %}checked{% endif %}>
+                <span>♿ Wheelchair Accessible</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                <input type="checkbox" name="senior_priority_darshan" value="1" {% if destination and destination.senior_priority_darshan %}checked{% endif %}>
+                <span>👴 Senior Citizen Priority Darshan</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                <input type="checkbox" name="battery_car_available" value="1" {% if destination and destination.battery_car_available %}checked{% endif %}>
+                <span>🛺 Electric Battery Car at Gate</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                <input type="checkbox" name="verified" value="1" {% if not destination or destination.verified %}checked{% endif %}>
+                <span>✅ Verified Status</span>
+            </label>
+        </div>
+
+        <button type="submit" class="btn-primary" style="padding: 12px 32px; font-size: 1rem;">
+            Save Destination
+        </button>
+    </form>
+</div>
+{% endblock %}

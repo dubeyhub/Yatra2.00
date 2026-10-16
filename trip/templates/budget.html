@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Pilgrimage Budget Calculator - Yatra{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <div>
+        <h2><i class="fa-solid fa-calculator" style="color: var(--primary-color);"></i> Pilgrimage Expense & Budget Calculator</h2>
+        <p>Real-time itemized cost estimates for travel, dharamshalas, sattvic meals, and temple darshan</p>
+    </div>
+</div>
+
+<div class="detail-grid">
+    <!-- Left Column: Interactive Inputs -->
+    <div>
+        <div class="info-card" id="budget-calculator-form">
+            <h3 style="color: var(--secondary-color);"><i class="fa-solid fa-sliders"></i> Customize Pilgrimage Parameters</h3>
+
+            <div style="margin-bottom: 20px;">
+                <label for="calc-days" style="display: block; font-weight: 700; margin-bottom: 6px;">Total Pilgrimage Days: <span id="days-val-display" style="color: var(--primary-color);">3 Days</span></label>
+                <input type="range" id="calc-days" min="1" max="15" value="3" style="width: 100%;" oninput="document.getElementById('days-val-display').textContent = this.value + ' Days'">
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label for="calc-travelers" style="display: block; font-weight: 700; margin-bottom: 6px;">Number of Pilgrims: <span id="travelers-val-display" style="color: var(--primary-color);">2 Pilgrims</span></label>
+                <input type="range" id="calc-travelers" min="1" max="16" value="2" style="width: 100%;" oninput="document.getElementById('travelers-val-display').textContent = this.value + ' Pilgrims'">
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 700; margin-bottom: 8px;">Budget Comfort Tier</label>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: #fdfaf6; padding: 8px 14px; border: 1px solid var(--border-color); border-radius: 4px;">
+                        <input type="radio" name="budget_tier" value="economy">
+                        <span><strong>Economy</strong> (Ashrams & Langar)</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: #fdfaf6; padding: 8px 14px; border: 1px solid var(--border-color); border-radius: 4px;">
+                        <input type="radio" name="budget_tier" value="standard" checked>
+                        <span><strong>Standard</strong> (Pure-Veg Hotels & Cabs)</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: #fdfaf6; padding: 8px 14px; border: 1px solid var(--border-color); border-radius: 4px;">
+                        <input type="radio" name="budget_tier" value="comfort">
+                        <span><strong>Comfort</strong> (Havelis & VIP Passes)</span>
+                    </label>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 700; margin-bottom: 8px;">Traveler Profile & Accessibility</label>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: #fdfaf6; padding: 8px 14px; border: 1px solid var(--border-color); border-radius: 4px;">
+                        <input type="radio" name="traveler_profile" value="seniors">
+                        <span>👴 <strong>Seniors / Elders</strong> (Battery carts & ease)</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: #fdfaf6; padding: 8px 14px; border: 1px solid var(--border-color); border-radius: 4px;">
+                        <input type="radio" name="traveler_profile" value="family" checked>
+                        <span>👨‍👩‍👧‍👦 <strong>Family</strong></span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: #fdfaf6; padding: 8px 14px; border: 1px solid var(--border-color); border-radius: 4px;">
+                        <input type="radio" name="traveler_profile" value="couple">
+                        <span>👫 <strong>Couple</strong></span>
+                    </label>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+                <label for="calc-vehicle" style="display: block; font-weight: 700; margin-bottom: 6px;">Dedicated Vehicle (Optional)</label>
+                <select id="calc-vehicle" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                    <option value="">Auto-Recommend Based on Pilgrims</option>
+                    {% for v in vehicles %}
+                        <option value="{{ v.id }}">{{ v.vehicle_type }} (Capacity: {{ v.capacity }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Real-time Itemized Output -->
+    <div>
+        <div class="budget-summary-box" style="margin-bottom: 20px;">
+            <div style="font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Total Estimated Pilgrimage Budget</div>
+            <div id="calc-grand-total" class="budget-grand-total" style="font-size: 2.4rem; margin: 6px 0;">₹0</div>
+            <div id="calc-per-person" style="font-size: 1rem; color: #1e8449; font-weight: 600;">₹0 per pilgrim</div>
+
+            <table class="budget-table" style="margin-top: 20px;">
+                <tbody>
+                    <tr>
+                        <td><i class="fa-solid fa-hotel" style="color: var(--primary-color);"></i> Accommodation & Ashrams</td>
+                        <td style="text-align: right; font-weight: 700;" id="calc-breakdown-accom">₹0</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa-solid fa-bowl-food" style="color: var(--primary-color);"></i> Sattvic Meals & Prasad</td>
+                        <td style="text-align: right; font-weight: 700;" id="calc-breakdown-food">₹0</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa-solid fa-car" style="color: var(--primary-color);"></i> Travel & Local Transport</td>
+                        <td style="text-align: right; font-weight: 700;" id="calc-breakdown-transport">₹0</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa-solid fa-hands-praying" style="color: var(--primary-color);"></i> Darshan Passes & Pooja Seva</td>
+                        <td style="text-align: right; font-weight: 700;" id="calc-breakdown-darshan">₹0</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa-solid fa-wheelchair" style="color: var(--primary-color);"></i> Senior/Accessibility & Misc</td>
+                        <td style="text-align: right; font-weight: 700;" id="calc-breakdown-misc">₹0</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa-solid fa-shield-heart" style="color: var(--primary-color);"></i> Contingency Reserve (8%)</td>
+                        <td style="text-align: right; font-weight: 700;" id="calc-breakdown-buffer">₹0</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="margin-top: 16px; text-align: center;">
+                <a href="{{ url_for('trips.planner') }}" class="btn-primary" style="padding: 10px 24px; font-size: 1rem;">
+                    Build Multi-Day Itinerary with this Budget &rarr;
+                </a>
+            </div>
+        </div>
+
+        <div style="padding: 14px 18px; background: #fef9e7; border-left: 4px solid var(--accent-gold); border-radius: 4px; font-size: 0.88rem; color: #7d5a00;">
+            <i class="fa-solid fa-circle-info"></i> {{ disclaimer }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/budget.js') }}"></script>
+{% endblock %}
